@@ -1,0 +1,37 @@
+{
+  "Actions": [
+    {
+      "Icon": "icon", 
+      "Name": "Youtube-dl Plugin", 
+      "States": [
+        {
+          "Image": "defaultImage",
+          "TitleAlignment": "middle", 
+          "FontSize": "7"
+        }
+      ], 
+      "SupportedInMultiActions": false,
+      "Tooltip": "Execute youtube-dl with a URL in the clipboard.", 
+      "UUID": "com.elgato.youtube-dl-plugin.youtube-dl-plugin"
+    }
+  ], 
+  "SDKVersion": 2,
+  "Author": "Zongyi Yang", 
+  "CodePathWin": "youtube-dl-plugin.exe",
+  "PropertyInspectorPath": "youtube-dl-plugin_pi.html",
+  "Description": "Execute youtube-dl with a URL in the clipboard.", 
+  "Name": "Youtube-dl Plugin", 
+  "Icon": "pluginIcon", 
+  "URL": "https://github.com/ZongyiYang/streamdeck-youtube-dl-plugin", 
+  "Version": "1.0",
+  "OS": [
+    {
+        "Platform": "windows", 
+        "MinimumVersion" : "10"
+    }
+  ],
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+    }
+}

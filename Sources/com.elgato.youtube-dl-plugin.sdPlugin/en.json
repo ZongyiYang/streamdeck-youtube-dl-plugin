@@ -1,0 +1,8 @@
+{
+  "Description": "Execute youtube-dl with a URL in the clipboard.", 
+  "Name": "Youtube-dl Plugin", 
+  "com.elgato.youtube-dl-plugin.youtube-dl-plugin": {
+    "Name": "Youtube-dl Plugin", 
+    "Tooltip": "Execute youtube-dl with a URL in the clipboard."
+  }
+}

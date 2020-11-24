@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\Common\main.cpp" />
+    <ClCompile Include="..\MyStreamDeckPlugin.cpp" />
+    <ClCompile Include="..\Common\ESDConnectionManager.cpp">
+      <Filter>Elgato</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\ESDLocalizer.cpp">
+      <Filter>Elgato</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\ESDUtilitiesWindows.cpp">
+      <Filter>Elgato</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Elgato</Filter>
+    </ClCompile>
+    <ClCompile Include="DownloadThread.cpp" />
+    <ClCompile Include="VideoDownloadUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="FileUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\MyStreamDeckPlugin.h" />
+    <ClInclude Include="ClipboardUtils.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceUtils.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="UrlUtils.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\EPLJSONUtils.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ESDBasePlugin.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ESDConnectionManager.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ESDLocalizer.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ESDSDKDefines.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ESDUtilities.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Elgato</Filter>
+    </ClInclude>
+    <ClInclude Include="DownloadThread.h" />
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="VideoDownloadUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="TimerThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{399c5972-7829-416c-8536-c624af8ac67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Elgato">
+      <UniqueIdentifier>{d9944555-56eb-4a29-8c15-21ac755679b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{547c9f5e-eeea-4f58-a715-7b060363bb1d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Vendor\youtube-dl.exe">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\Vendor\ffmpeg.exe">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.html" />
+    <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="com.elgato.youtube-dl-plugin.sdPlugin.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

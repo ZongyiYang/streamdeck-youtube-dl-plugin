@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Youtube-dl Streamdeck Plugin</title>
+    <link rel="stylesheet" href="sdpi.css">
+</head>
+<body>
+    <div class="sdpi-wrapper">
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Label</div>
+            <input class="sdpi-item-value" id="label_textbox"
+                   placeholder="Set a label for this button." oninput="updateSettingsToPlugin();"
+                   title="Label to be displayed on the button."
+                   value="">
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Download Format</div>
+            <select class="sdpi-item-value select" id="download_type_menu"
+                    onchange="updateSettingsToPlugin();"
+                    value="0">
+                <option disabled="disabled" selected="selected" hidden="hidden"></option>
+                <option value="0">Video</option>
+                <option value="1">Audio Only</option>
+                <option value="2">Video Only</option>
+            </select>
+        </div>
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">Output Folder</div>
+            <input class="sdpi-item-value" id="output_folder_textbox"
+                   placeholder="Set output folder path. (default = desktop)" oninput="updateSettingsToPlugin();"
+                   title="Select path to output folder. This folder must exist. If empty, the desktop is used."
+                   value="">
+        </div>
+        <details>
+            <summary>Advanced</summary>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Max Downloads</div>
+                <input class="sdpi-item-value" id="max_downloads_textbox" type="number" pattern="\d"
+                       placeholder="Max playlist downloads. (0 = infinite)" oninput="updateSettingsToPlugin();"
+                       title="Use to limit the maximum number of downloads. Useful for playlists. Set to 0 for no limit."
+                       value="1">
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Youtube-dl Path</div>
+                <input class="sdpi-item-value" id="youtubedl_path_textbox"
+                       placeholder="youtube-dl.exe path (default = internal exe)" oninput="updateSettingsToPlugin();"
+                       title="Use this to specify the location of youtube-dl.exe. ffmpeg.exe should be in the same folder. If empty, uses the default exe unpacked by the plugin."
+                       value="">
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Custom Command</div>
+                <input class="sdpi-item-value" id="cmd_textbox"
+                       placeholder="Custom commands overwrite settings." oninput="updateSettingsToPlugin();"
+                       title="Use this to overwrite all previous settings except youtube-dl path with a custom command. The url will be appended to the end of this command."
+                       value="">
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Command preview</div>
+                <textarea type="textarea" id="sample_command_textbox" readonly
+                          title="Sample command used to execute youtube-dl.exe"
+                          rows="4"
+                          value=""></textarea>
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Update</div>
+                <button class="sdpi-item-value" id="update_button"
+                        title="Runs youtube-dl.exe --update"
+                        onclick="sendCommand('update')">
+                    Update youtube-dl
+                </button>
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-label">Kill Tasks</div>
+                <button class="sdpi-item-value" id="kill_context_button"
+                        title="Kills download tasks spawned by this particular context."
+                        onclick="if (confirm('Kill downloads linked to this button?')) sendCommand('killContext');">
+                    Kill Button Tasks
+                </button>
+                <button class="sdpi-item-value" id="kill_all_button"
+                        title="Kills all running download tasks."
+                        onclick="if (confirm('Kill all downloads?')) sendCommand('killAll');">
+                    Kill All Tasks
+                </button>
+            </div>
+        </details>
+        <details>
+            <summary>About</summary>
+            <div class="sdpi-item">
+                <div class="sdpi-item-value">
+                    <p style="text-align: center; margin-left: 30px;">
+                        <a href="#" onclick="openUrl('https://github.com/ZongyiYang/streamdeck-youtube-dl-plugin'); return false;"
+                           style="text-decoration: none; font-size: 20px;">Github</a>
+                    </p>
+                </div>
+            </div>
+            <div class="sdpi-heading">
+                Support the dev :)
+            </div>
+            <div class="sdpi-item">
+                <div class="sdpi-item-value">
+                    <p style="text-align: center; margin-left: 30px;">
+                        <a href="#" onclick="openUrl('https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=95B98SPYFY3LS&currency_code=USD'); return false;">
+                            <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" />
+                            <br />
+                            <img src="DonateQR.png" />
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </details>
+    </div>
+    <script src="youtube-dl-plugin_pi.js"></script>
+</body>
+</html>

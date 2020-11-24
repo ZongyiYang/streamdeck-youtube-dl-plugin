@@ -1,0 +1,10 @@
+﻿  Extensions.cc
+  Node.cc
+  ParserDom.cc
+  ParserSax.cc
+  Uri.cc
+C:\Users\Z-PC\source\repos\TestCurl\TestCurl\htmlcxx\html\Uri.cc(564,1): warning C4996:  '_snprintf': This function or variable may be unsafe. Consider using _snprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  utils.cc
+  Generating Code...
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\ucrt\stdio.h(1961): message :  see declaration of '_snprintf'
+  htmlcxx.vcxproj -> C:\Users\Z-PC\source\repos\TestCurl\TestCurl\htmlcxx\Release\htmlcxx.lib
