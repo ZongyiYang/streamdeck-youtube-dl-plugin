@@ -19,11 +19,12 @@
  *
  * @param[in] url the url to download from
  * @param[in] data the metadata stored by the context
+ * @param[in] doUpdate update youtube-dl
  * @param[in] cvMutex the mutex to lock for the cv
  * @param[in] cv the condition variable to wake on completion
  * @param[in] results the queue to place finished results data
  */
-void DownloadThread::launchDownloadProcess(const std::string url, const contextData_t data,
+void DownloadThread::launchDownloadProcess(const std::string url, const contextData_t data, const bool doUpdate,
 										   std::mutex& cvMutex, std::condition_variable& cv,
 										   std::queue<threadData_t>& results)
 {
@@ -62,7 +63,7 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 
 	// check if output folder exists
 	// std::filesystem can throw an error, so catch that too
-	if (!data.doUpdate)
+	if (!doUpdate)
 	{
 		bool doesOutputFolderExist = true;
 		try
@@ -91,7 +92,7 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 			std::unique_lock<std::mutex> lk{ mCommandMutex };
 			if (mCommand.load() != KILL)
 			{
-				if (data.doUpdate) // update command
+				if (doUpdate) // update command
 				{
 					pi = videodownloadutils::startDownload(data.youtubeDlExePath, " --update");
 				}
@@ -135,11 +136,11 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 	catch (std::exception& e)
 	{
 		exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
-			(data.doUpdate ? std::string("Update") : std::string("Download")) + "\nfailed", FAILED);
+			(doUpdate ? std::string("Update") : std::string("Download")) + "\nfailed", FAILED);
 		return;
 	}
 
-	if (data.doUpdate)
+	if (doUpdate)
 		exitDownloadProcess("Youtube-dl updated.", "Update\nfinished", UPDATED);
 	else
 		exitDownloadProcess(std::nullopt, std::nullopt, SUCCESS);

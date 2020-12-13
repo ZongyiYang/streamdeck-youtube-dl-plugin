@@ -66,11 +66,12 @@ public:
 	 * @param[in] url the url to download from
 	 * @param[in] data the metadata stored by the context
 	 * @param[in] inContext the button context for this thread
+	 * @param[in] doUpdate update youtube-dl
 	 * @param[in] cvMutex the mutex to lock for the cv
 	 * @param[in] cv the condition variable to wake on completion
 	 * @param[in] results the queue to place finished results data
 	 */
-	void start(const std::string& url, const contextData_t& data, const std::string& inContext,
+	void start(const std::string& url, const contextData_t& data, const std::string& inContext, const bool doUpdate,
 		       std::mutex& cvMutex, std::condition_variable& cv,
 		       std::queue<threadData_t>& results)
 	{
@@ -82,7 +83,7 @@ public:
 
 		mData.context = inContext;
 
-		t = std::thread(&DownloadThread::launchDownloadProcess, this, url, data,
+		t = std::thread(&DownloadThread::launchDownloadProcess, this, url, data, doUpdate,
 			            std::ref(cvMutex), std::ref(cv), std::ref(results));
 	}
 
@@ -127,7 +128,7 @@ private:
 	std::mutex mDataMutex;
 	threadData_t mData;
 
-	void launchDownloadProcess(const std::string url, const contextData_t data,
+	void launchDownloadProcess(const std::string url, const contextData_t data, const bool doUpdate,
 		std::mutex& cvMutex, std::condition_variable& cv,
 		std::queue <threadData_t> & results);
 };

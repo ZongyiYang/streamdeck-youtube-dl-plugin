@@ -46,13 +46,13 @@ private:
 	
 	bool initYoutubeDl();
 	
-	std::mutex mVisibleContextsMutex;
 	struct buttonData_t
 	{
 		contextData_t data = {};
 		std::unique_ptr<TimerThread> buttonTimer = nullptr;
-		std::unique_ptr<TimerThread> errorMsgTimer = nullptr;
+		std::optional<std::string> lastErrorMsg = std::nullopt;
 	};
+	std::mutex mVisibleContextsMutex;
 	std::unordered_map<std::string, buttonData_t> mVisibleContexts;
 	
 	std::thread mDlMonitor;
@@ -77,7 +77,7 @@ private:
 	void runPICommands(const std::string& inContext, const json& inPayload, const std::unique_lock<std::mutex>& lk);
 
 	void downloadMonitor();
-	void submitDownloadTask(const std::string& url, const contextData_t& data, const std::string& inContext, const std::unique_lock<std::mutex>& lk);
+	void submitDownloadTask(const std::string& url, const contextData_t& data, const std::string& inContext, const bool doUpdate, const std::unique_lock<std::mutex>& lk);
 	void cleanupDownloads(const std::string& context, const std::unique_lock<std::mutex>& lk);
 	std::unordered_set <std::string> getModifiedContexts(const std::unique_lock<std::mutex>& lk);
 	void updateUI(const std::string & inContext, const std::unique_lock<std::mutex>& lk);

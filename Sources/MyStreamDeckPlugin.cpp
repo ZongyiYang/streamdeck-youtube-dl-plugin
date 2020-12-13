@@ -139,7 +139,7 @@ std::unordered_set <std::string> MyStreamDeckPlugin::getModifiedContexts(const s
 
 		// update error message for this context if there are any
 		if (threadData.buttonMsg && mVisibleContexts.find(threadData.context) != mVisibleContexts.end())
-			mVisibleContexts.at(threadData.context).data.lastErrorMsg = threadData.buttonMsg;
+			mVisibleContexts.at(threadData.context).lastErrorMsg = threadData.buttonMsg;
 	}
 
 	return modifiedContexts;
@@ -190,8 +190,8 @@ void MyStreamDeckPlugin::updateUI(const std::string& inContext, const std::uniqu
 		std::string errMsg = "\n";
 		if (mVisibleContexts.at(inContext).data.label)
 			label = *mVisibleContexts.at(inContext).data.label;
-		if (mVisibleContexts.at(inContext).data.lastErrorMsg)
-			errMsg = *mVisibleContexts.at(inContext).data.lastErrorMsg;
+		if (mVisibleContexts.at(inContext).lastErrorMsg)
+			errMsg = *mVisibleContexts.at(inContext).lastErrorMsg;
 
 		uint32_t totalThreads = 0;
 		uint32_t successfulThreads = 0;
@@ -208,8 +208,17 @@ void MyStreamDeckPlugin::updateUI(const std::string& inContext, const std::uniqu
 	}
 }
 
+/**
+ * Creates a new download task thread
+ *
+ * @param[in] url the url to download from
+ * @param[in] data the metadata stored by the context
+ * @param[in] inContext the button's context
+ * @param[in] doUpdate update youtube-dl
+ * @param[in] lk the lock for mutex mVisibleContextsMutex
+ */
 void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const contextData_t & data,
-	const std::string& inContext, const std::unique_lock<std::mutex>& lk)
+	const std::string& inContext, const bool doUpdate, const std::unique_lock<std::mutex>& lk)
 {
 	assert(lk.owns_lock());
 	assert(lk.mutex() == &mVisibleContextsMutex);
@@ -217,7 +226,7 @@ void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const conte
 	if (mActiveDownloads.find(inContext) == mActiveDownloads.end())
 		mActiveDownloads.insert({ inContext, {} });
 	std::shared_ptr<DownloadThread> dl = std::make_shared<DownloadThread>();
-	dl->start(url, data, inContext, cvMutex, cv, results);
+	dl->start(url, data, inContext, doUpdate, cvMutex, cv, results);
 	mActiveDownloads.at(inContext).threads.push_back(std::move(dl));
 }
 
@@ -226,7 +235,7 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string& inAction, const std
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
 	if (mConnectionManager != nullptr && mVisibleContexts.find(inContext) != mVisibleContexts.end())
 	{
-		mVisibleContexts.at(inContext).buttonTimer.reset(new TimerThread());
+		mVisibleContexts.at(inContext).buttonTimer->stop();
 
 		// get output folder name
 		std::string folder = videodownloadutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
@@ -256,7 +265,8 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		if (!mIsRunning.load())
 			return;
 
-		contextData_t& data = mVisibleContexts.at(inContext).data;
+		const contextData_t& data = mVisibleContexts.at(inContext).data;
+		std::optional<std::string>& lastErrorMsg = mVisibleContexts.at(inContext).lastErrorMsg;
 
 		// check if button timer completed
 		if (mVisibleContexts.at(inContext).buttonTimer != nullptr)
@@ -271,7 +281,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 				else
 				{
 					mConnectionManager->LogMessage("Error: cannot open folder: " + videodownloadutils::getOutputFolderName(data.outputFolder));
-					data.lastErrorMsg = "Error: cannot\nopen folder";
+					lastErrorMsg = "Error: cannot\nopen folder";
 					updateUI(inContext, lk);
 					return;
 				}
@@ -281,7 +291,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		if (mIsUpdating.load())
 		{
 			mConnectionManager->LogMessage("Error: cannot start download, update in progress.");
-			data.lastErrorMsg = "Error: update\nin progress";
+			lastErrorMsg = "Error: update\nin progress";
 			updateUI(inContext, lk);
 			return;
 		}
@@ -296,7 +306,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		{
 			mConnectionManager->LogMessage("Invalid clipboard:");
 			mConnectionManager->LogMessage(e.what());
-			data.lastErrorMsg = "Invalid\nclipboard";
+			lastErrorMsg = "Invalid\nclipboard";
 			updateUI(inContext, lk);
 			return;
 		}
@@ -305,7 +315,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		if (!urlutils::isValidUrl(clipboardText.c_str()))
 		{
 			mConnectionManager->LogMessage("Invalid URL: " + clipboardText);
-			data.lastErrorMsg = "Invalid\nURL";
+			lastErrorMsg = "Invalid\nURL";
 			updateUI(inContext, lk);
 			return;
 		}
@@ -317,13 +327,13 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		else
 		{
 			mConnectionManager->LogMessage("KeyUpForAction Error: No Settings");
-			data.lastErrorMsg = "Failed to\nreceive settings";
+			lastErrorMsg = "Failed to\nreceive settings";
 			updateUI(inContext, lk);
 			return;
 		}
 		// spawn a new download task
-		mVisibleContexts.at(inContext).data.lastErrorMsg = std::nullopt; // clear error
-		submitDownloadTask(clipboardText, settings, inContext, lk);
+		lastErrorMsg = std::nullopt; // clear error
+		submitDownloadTask(clipboardText, settings, inContext, false, lk);
 		updateUI(inContext, lk);
 	}
 }
@@ -385,11 +395,12 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string& inAction, const 
 	buttonData_t newButtonData{};
 	if (inPayload.find("settings") != inPayload.end())
 		readPayload(newButtonData.data, inPayload["settings"], lk);
+	newButtonData.buttonTimer.reset(new TimerThread());
 
 	mVisibleContexts.emplace( inContext, std::move(newButtonData) );
 
 	if (!mIsRunning.load())
-		newButtonData.data.lastErrorMsg = "Error: Bad\nInitialization";
+		newButtonData.lastErrorMsg = "Error: Bad\nInitialization";
 	updateUI(inContext, lk);
 }
 
@@ -430,12 +441,14 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 		if (mVisibleContexts.find(inContext) == mVisibleContexts.end())
 			return;
 
+		std::optional<std::string>& lastErrorMsg = mVisibleContexts.at(inContext).lastErrorMsg;
+
 		if (inPayload["command"] == "getSampleCommand")
 		{
 			json j;
 
 			// construct the command string and send it
-			contextData_t& data = mVisibleContexts.at(inContext).data;
+			const contextData_t& data = mVisibleContexts.at(inContext).data;
 			std::string exe = videodownloadutils::getYoutubeDlExePath(data.youtubeDlExePath);
 			std::string cmd;
 			if (data.customCommand)
@@ -465,22 +478,20 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 			contextData_t & data = mVisibleContexts.at(inContext).data;
 			if (mActiveDownloads.size() > 0)
 			{
-				data.lastErrorMsg = "youtube-dl\nin use.";
+				lastErrorMsg = "youtube-dl\nin use.";
 				mConnectionManager->LogMessage("Error: context " + inContext + " requested update but downloads are still pending.");
 			}
 			else
 			{
 				mIsUpdating = true;
-				data.doUpdate = true;
-				data.lastErrorMsg = "Updating\n";
-				submitDownloadTask("", data, inContext, lk);
+				lastErrorMsg = "Updating\n";
+				submitDownloadTask("", data, inContext, true, lk);
 			}
 		}
 		else if (inPayload["command"] == "killContext")
 		{
 			mConnectionManager->LogMessage("Killing threads spawned by context: " + inContext);
-			contextData_t& data = mVisibleContexts.at(inContext).data;
-			data.lastErrorMsg = "Stopping\nDownloads";
+			lastErrorMsg = "Stopping\nDownloads";
 			if (mActiveDownloads.find(inContext) != mActiveDownloads.end())
 			{
 				for (const auto& thd : mActiveDownloads.at(inContext).threads)
@@ -492,8 +503,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 		else if (inPayload["command"] == "killAll")
 		{
 			mConnectionManager->LogMessage("Killing all threads");
-			contextData_t& data = mVisibleContexts.at(inContext).data;
-			data.lastErrorMsg = "Stopping All\nDownloads";
+			lastErrorMsg = "Stopping All\nDownloads";
 			for (const auto ctx : mActiveDownloads)
 			{
 				for (const auto& thd : ctx.second.threads)

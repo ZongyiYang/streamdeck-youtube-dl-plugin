@@ -23,6 +23,4 @@ struct contextData_t
 	std::optional <uint32_t> maxDownloads = std::nullopt;
 	std::optional <uint32_t> type = std::nullopt;
 	std::optional<std::string> customCommand = std::nullopt;
-	std::optional<std::string> lastErrorMsg = std::nullopt;
-	bool doUpdate = false;
 };
