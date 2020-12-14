@@ -1,3 +1,11 @@
+//==============================================================================
+/**
+@file       TimerThread.h
+@brief      Thread that executes a selected function once after a certain amount of time
+@copyright  (c) 2020, Zongyi Yang
+**/
+//==============================================================================
+
 #pragma once
 
 #include <atomic>

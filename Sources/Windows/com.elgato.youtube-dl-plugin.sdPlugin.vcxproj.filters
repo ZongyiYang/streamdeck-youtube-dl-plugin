@@ -16,10 +16,10 @@
       <Filter>Elgato</Filter>
     </ClCompile>
     <ClCompile Include="DownloadThread.cpp" />
-    <ClCompile Include="VideoDownloadUtils.cpp">
+    <ClCompile Include="FileUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="FileUtils.cpp">
+    <ClCompile Include="YoutubeDlUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -60,13 +60,13 @@
     </ClInclude>
     <ClInclude Include="DownloadThread.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="VideoDownloadUtils.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="FileUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="TimerThread.h" />
+    <ClInclude Include="YoutubeDlUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utils">

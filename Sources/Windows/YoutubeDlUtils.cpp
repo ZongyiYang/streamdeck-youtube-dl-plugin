@@ -1,7 +1,15 @@
+//==============================================================================
+/**
+@file       YoutubeDlUtils.cpp
+@brief      Utility functions for running youtube-dl.exe
+@copyright  (c) 2020, Zongyi Yang
+**/
+//==============================================================================
+
 #pragma once
 #include "pch.h"
 
-#include "VideoDownloadUtils.h"
+#include "YoutubeDlUtils.h"
 #include <filesystem>
 #include <atlbase.h>
 
@@ -15,7 +23,7 @@
  * @return string containing the output folder
  * @throws runtime error if it cannot get desktop path
  */
-std::string videodownloadutils::getOutputFolderName(const std::optional<std::string>& optOutputFolder)
+std::string youtubedlutils::getOutputFolderName(const std::optional<std::string>& optOutputFolder)
 {
 	if (optOutputFolder)
 		return *optOutputFolder;
@@ -33,7 +41,7 @@ std::string videodownloadutils::getOutputFolderName(const std::optional<std::str
  * @param[in] optType the type of download to perform
  * @return string containing the command
  */
-std::string videodownloadutils::getDownloadCommand(const std::string& url,
+std::string youtubedlutils::getDownloadCommand(const std::string& url,
 	const std::optional<std::string>& optOutputFolder,
 	const std::optional<std::string>& optFilename,
 	const std::optional<uint32_t>& optMaxDownloads,
@@ -86,7 +94,7 @@ std::string videodownloadutils::getDownloadCommand(const std::string& url,
  * @param[in] optCustomCommand optional custom command.
  * @return vector containing all the commands
  */
-std::vector <std::string> videodownloadutils::getCommandQueue(const std::string& url,
+std::vector <std::string> youtubedlutils::getCommandQueue(const std::string& url,
 	const std::optional<std::string>& optOutputFolder,
 	const std::optional<std::string>& optFilename,
 	const std::optional<uint32_t>& optMaxDownloads,
@@ -95,7 +103,7 @@ std::vector <std::string> videodownloadutils::getCommandQueue(const std::string&
 {
 	std::vector <std::string> cmds;
 	for (const auto& format : optType)
-		cmds.push_back(videodownloadutils::getDownloadCommand(url, optOutputFolder, optFilename, optMaxDownloads, format));
+		cmds.push_back(youtubedlutils::getDownloadCommand(url, optOutputFolder, optFilename, optMaxDownloads, format));
 
 	if (optCustomCommand && !(*optCustomCommand).empty())
 		cmds.push_back(" " + *optCustomCommand + " " + url);
@@ -109,7 +117,7 @@ std::vector <std::string> videodownloadutils::getCommandQueue(const std::string&
  *
  * @return path to youtube-dl.exe
  */
-std::string videodownloadutils::getYoutubeDlExePath(const std::optional<std::string>& optyoutubeDlExePath)
+std::string youtubedlutils::getYoutubeDlExePath(const std::optional<std::string>& optyoutubeDlExePath)
 {
 	const std::string defaultYoutubeDlExePath = "youtube-dl.exe";
 	if (optyoutubeDlExePath)
@@ -118,7 +126,7 @@ std::string videodownloadutils::getYoutubeDlExePath(const std::optional<std::str
 		return defaultYoutubeDlExePath;
 }
 
-std::string videodownloadutils::getLastErrorAsString()
+std::string youtubedlutils::getLastErrorAsString()
 {
 	//Get the error message, if any.
 	DWORD errorMessageID = ::GetLastError();
@@ -145,7 +153,7 @@ std::string videodownloadutils::getLastErrorAsString()
  * @throws invalid_argument if youtube-dl.exe missing from path, runtime_error if process could not launch, could not retrive exit code, or download failed.
  *         filesystem_error if filesystem exists fails
  */
-PROCESS_INFORMATION videodownloadutils::startDownload(const std::optional<std::string>& optyoutubeDlExePath, const std::string& cmd)
+PROCESS_INFORMATION youtubedlutils::startDownload(const std::optional<std::string>& optyoutubeDlExePath, const std::string& cmd)
 {
 	std::string youtubeDlExePath = getYoutubeDlExePath(optyoutubeDlExePath);
 	if (!std::filesystem::exists(youtubeDlExePath))
@@ -184,7 +192,7 @@ PROCESS_INFORMATION videodownloadutils::startDownload(const std::optional<std::s
  *
  * @param[in] pi the process information struct
  */
-void videodownloadutils::waitForProcess(PROCESS_INFORMATION pi)
+void youtubedlutils::waitForProcess(PROCESS_INFORMATION pi)
 {
 	// Wait until child process exits.
 	// Note: this is only safe for processes that do not create windows. Otherwise MsgWaitForMultipleObjects may be needed.
@@ -204,7 +212,7 @@ void videodownloadutils::waitForProcess(PROCESS_INFORMATION pi)
  *
  * @param[in] pi the process information struct
  */
-void videodownloadutils::closeProcess(PROCESS_INFORMATION pi)
+void youtubedlutils::closeProcess(PROCESS_INFORMATION pi)
 {
 	DWORD exit_code;
 	if (FALSE == GetExitCodeProcess(pi.hProcess, &exit_code))

@@ -12,7 +12,7 @@
 #include "Windows/ResourceUtils.hpp"
 #include "Windows/ClipboardUtils.hpp"
 #include "Windows/UrlUtils.hpp"
-#include "Windows/VideoDownloadUtils.h"
+#include "Windows/YoutubeDlUtils.h"
 
 
 
@@ -238,7 +238,7 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string& inAction, const std
 		mVisibleContexts.at(inContext).buttonTimer->stop();
 
 		// get output folder name
-		std::string folder = videodownloadutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
+		std::string folder = youtubedlutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
 
 		// start timer that opens this folder once time is reached
 		const uint32_t LONG_PRESS_TIME_MILLIS = 500;
@@ -280,7 +280,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 					return;
 				else
 				{
-					mConnectionManager->LogMessage("Error: cannot open folder: " + videodownloadutils::getOutputFolderName(data.outputFolder));
+					mConnectionManager->LogMessage("Error: cannot open folder: " + youtubedlutils::getOutputFolderName(data.outputFolder));
 					lastErrorMsg = "Error: cannot\nopen folder";
 					updateUI(inContext, lk);
 					return;
@@ -362,6 +362,7 @@ void MyStreamDeckPlugin::readPayload(contextData_t& data, const json& inPayload,
 		return (data) ? std::stoi(*data) : std::optional<uint32_t>(std::nullopt);
 	};
 
+	// parse the json payload
 	try
 	{
 		if (inPayload.find("label") != inPayload.end())
@@ -466,13 +467,13 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 
 			json j;
 			const contextData_t& data = mVisibleContexts.at(inContext).data;
-			std::string exe = videodownloadutils::getYoutubeDlExePath(data.youtubeDlExePath);
+			std::string exe = youtubedlutils::getYoutubeDlExePath(data.youtubeDlExePath);
 
 			// first grab all the cmds based on selected options
 			std::vector<std::string> cmds;
 			try
 			{
-				cmds = videodownloadutils::getCommandQueue("url",
+				cmds = youtubedlutils::getCommandQueue("url",
 					data.outputFolder,
 					std::nullopt,
 					data.maxDownloads,

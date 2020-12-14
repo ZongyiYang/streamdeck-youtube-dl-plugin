@@ -12,7 +12,7 @@
 #include "pch.h"
 
 #include "DownloadThread.h"
-#include "VideoDownloadUtils.h"
+#include "YoutubeDlUtils.h"
 
 /**
  * Launch a new youtube-dl process.
@@ -69,7 +69,7 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 			cmds.push_back(" --update");
 		else
 		{
-			cmds = videodownloadutils::getCommandQueue(url, data.outputFolder, std::nullopt, data.maxDownloads, data.downloadFormats, data.customCommand);
+			cmds = youtubedlutils::getCommandQueue(url, data.outputFolder, std::nullopt, data.maxDownloads, data.downloadFormats, data.customCommand);
 		}
 	}
 	catch (std::runtime_error& e)
@@ -113,17 +113,17 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 				std::unique_lock<std::mutex> lk{ mCommandMutex };
 				if (mCommand.load() != KILL)
 				{
-					pi = videodownloadutils::startDownload(data.youtubeDlExePath, cmd);
+					pi = youtubedlutils::startDownload(data.youtubeDlExePath, cmd);
 					mState = RUNNING;
 				}
 			}
 
-			videodownloadutils::waitForProcess(pi);
+			youtubedlutils::waitForProcess(pi);
 
 			{
 				std::unique_lock<std::mutex> lk{ mCommandMutex };
 				mState = STOPPING;
-				videodownloadutils::closeProcess(pi);
+				youtubedlutils::closeProcess(pi);
 			}
 		}
 		catch (std::filesystem::filesystem_error& e)

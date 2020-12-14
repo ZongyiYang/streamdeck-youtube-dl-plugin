@@ -1,6 +1,6 @@
 //==============================================================================
 /**
-@file       VideoDownloadUtils.hpp
+@file       YoutubeDlUtils.h
 @brief      Utility functions for running youtube-dl.exe
 @copyright  (c) 2020, Zongyi Yang
 **/
@@ -16,7 +16,7 @@
 #include <unordered_set>
 
 
-namespace videodownloadutils
+namespace youtubedlutils
 {
 	std::string getOutputFolderName(const std::optional<std::string>& optOutputFolder);
 

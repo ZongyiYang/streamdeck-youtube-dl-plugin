@@ -1,3 +1,10 @@
+//==============================================================================
+/**
+@file       FileUtils.cpp
+@brief      Utility functions for windows filesystem
+@copyright  (c) 2020, Zongyi Yang
+**/
+//==============================================================================
 #pragma once
 #include "pch.h"
 #include "FileUtils.h"
