@@ -46,14 +46,14 @@ private:
 	
 	bool initYoutubeDl();
 	
-	struct buttonData_t
+	struct contextData_t
 	{
-		contextData_t data = {};
+		contextSettings_t data = {};
 		std::unique_ptr<TimerThread> buttonTimer = nullptr;
 		std::optional<std::string> lastErrorMsg = std::nullopt;
 	};
 	std::mutex mVisibleContextsMutex;
-	std::unordered_map<std::string, buttonData_t> mVisibleContexts;
+	std::unordered_map<std::string, contextData_t> mVisibleContexts;
 	
 	std::thread mDlMonitor;
 	std::atomic<bool> mIsRunning = false;
@@ -73,11 +73,11 @@ private:
 	std::condition_variable cv;
 	std::queue<DownloadThread::threadData_t> results;
 
-	void readPayload(contextData_t& data, const json& inPayload, const std::unique_lock<std::mutex>& lk);
+	void readPayload(contextSettings_t& data, const json& inPayload, const std::unique_lock<std::mutex>& lk);
 	void runPICommands(const std::string& inContext, const json& inPayload, const std::unique_lock<std::mutex>& lk);
 
 	void downloadMonitor();
-	void submitDownloadTask(const std::string& url, const contextData_t& data, const std::string& inContext, const bool doUpdate, const std::unique_lock<std::mutex>& lk);
+	void submitDownloadTask(const std::string& url, const contextSettings_t& data, const std::string& inContext, const bool doUpdate, const std::unique_lock<std::mutex>& lk);
 	void cleanupDownloads(const std::string& context, const std::unique_lock<std::mutex>& lk);
 	std::unordered_set <std::string> getModifiedContexts(const std::unique_lock<std::mutex>& lk);
 	void updateUI(const std::string & inContext, const std::unique_lock<std::mutex>& lk);

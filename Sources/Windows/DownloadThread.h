@@ -71,7 +71,7 @@ public:
 	 * @param[in] cv the condition variable to wake on completion
 	 * @param[in] results the queue to place finished results data
 	 */
-	void start(const std::string& url, const contextData_t& data, const std::string& inContext, const bool doUpdate,
+	void start(const std::string& url, const contextSettings_t& data, const std::string& inContext, const bool doUpdate,
 		       std::mutex& cvMutex, std::condition_variable& cv,
 		       std::queue<threadData_t>& results)
 	{
@@ -128,7 +128,7 @@ private:
 	std::mutex mDataMutex;
 	threadData_t mData;
 
-	void launchDownloadProcess(const std::string url, const contextData_t data, const bool doUpdate,
+	void launchDownloadProcess(const std::string url, const contextSettings_t data, const bool doUpdate,
 		std::mutex& cvMutex, std::condition_variable& cv,
 		std::queue <threadData_t> & results);
 };

@@ -14,9 +14,6 @@
 #include <filesystem>
 #include <atlbase.h>
 
-
-
-
 /**
  * Process optional output folder to return its string or just get the default output folder which is the desktop folder
  *

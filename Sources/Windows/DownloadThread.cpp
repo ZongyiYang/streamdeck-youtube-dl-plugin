@@ -25,7 +25,7 @@
  * @param[in] cv the condition variable to wake on completion
  * @param[in] results the queue to place finished results data
  */
-void DownloadThread::launchDownloadProcess(const std::string url, const contextData_t data, const bool doUpdate,
+void DownloadThread::launchDownloadProcess(const std::string url, const contextSettings_t data, const bool doUpdate,
 										   std::mutex& cvMutex, std::condition_variable& cv,
 										   std::queue<threadData_t>& results)
 {

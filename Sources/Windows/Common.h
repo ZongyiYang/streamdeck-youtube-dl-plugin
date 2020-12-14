@@ -24,7 +24,8 @@ enum DL_TYPE
 	VIDEO_ONLY
 };
 
-struct contextData_t
+// settings sent by PI
+struct contextSettings_t
 {
 	std::optional<std::string> label = std::nullopt;
 	std::optional<std::string> youtubeDlExePath = std::nullopt;

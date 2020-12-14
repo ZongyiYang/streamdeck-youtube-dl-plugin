@@ -12,7 +12,6 @@
 
 #include <string>
 
-
 namespace windowsprocessutils
 {
 	PROCESS_INFORMATION startProcess(const std::string& exePath, const std::string& cmd);

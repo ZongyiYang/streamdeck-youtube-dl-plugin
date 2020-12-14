@@ -217,7 +217,7 @@ void MyStreamDeckPlugin::updateUI(const std::string& inContext, const std::uniqu
  * @param[in] doUpdate update youtube-dl
  * @param[in] lk the lock for mutex mVisibleContextsMutex
  */
-void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const contextData_t & data,
+void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const contextSettings_t & data,
 	const std::string& inContext, const bool doUpdate, const std::unique_lock<std::mutex>& lk)
 {
 	assert(lk.owns_lock());
@@ -265,7 +265,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		if (!mIsRunning.load())
 			return;
 
-		const contextData_t& data = mVisibleContexts.at(inContext).data;
+		const contextSettings_t& data = mVisibleContexts.at(inContext).data;
 		std::optional<std::string>& lastErrorMsg = mVisibleContexts.at(inContext).lastErrorMsg;
 
 		// check if button timer completed
@@ -321,7 +321,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		}
 
 		// load settings
-		contextData_t settings{};
+		contextSettings_t settings{};
 		if (inPayload.find("settings") != inPayload.end())
 			readPayload(settings, inPayload["settings"], lk);
 		else
@@ -345,7 +345,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
  * @param[in] inPayload the json payload to read
  * @param[in] lk the lock for mutex mVisibleContextsMutex
  */
-void MyStreamDeckPlugin::readPayload(contextData_t& data, const json& inPayload, const std::unique_lock<std::mutex>& lk)
+void MyStreamDeckPlugin::readPayload(contextSettings_t& data, const json& inPayload, const std::unique_lock<std::mutex>& lk)
 {
 	assert(lk.owns_lock());
 	assert(lk.mutex() == &mVisibleContextsMutex);
@@ -410,7 +410,7 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string& inAction, const 
 {
 	// On key appearing, remember the context and store the settings
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
-	buttonData_t newButtonData{};
+	contextData_t newButtonData{};
 	if (inPayload.find("settings") != inPayload.end())
 		readPayload(newButtonData.data, inPayload["settings"], lk);
 	newButtonData.buttonTimer.reset(new TimerThread());
@@ -466,7 +466,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 			// construct the command string and send it back to PI
 
 			json j;
-			const contextData_t& data = mVisibleContexts.at(inContext).data;
+			const contextSettings_t& data = mVisibleContexts.at(inContext).data;
 			std::string exe = youtubedlutils::getYoutubeDlExePath(data.youtubeDlExePath);
 
 			// first grab all the cmds based on selected options
@@ -499,7 +499,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 		}
 		else if (inPayload["command"] == "update")
 		{
-			contextData_t & data = mVisibleContexts.at(inContext).data;
+			contextSettings_t & data = mVisibleContexts.at(inContext).data;
 			if (mActiveDownloads.size() > 0)
 			{
 				lastErrorMsg = "youtube-dl\nin use.";
