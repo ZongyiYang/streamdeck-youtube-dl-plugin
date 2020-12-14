@@ -61,87 +61,100 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 		mPtr = nullptr;
 	};
 
-	// check if output folder exists
-	// std::filesystem can throw an error, so catch that too
-	if (!doUpdate)
-	{
-		bool doesOutputFolderExist = true;
-		try
-		{
-			if (data.outputFolder && !std::filesystem::exists(*data.outputFolder))
-				doesOutputFolderExist = false;
-		}
-		catch (std::filesystem::filesystem_error& e)
-		{
-			exitDownloadProcess("Output folder filesystem error: " + *data.outputFolder + "\n" + std::string(e.what()),
-				"Invalid\noutput folder", FAILED);
-			return;
-		}
-		if (!doesOutputFolderExist)
-		{
-			exitDownloadProcess("Invalid output folder: " + *data.outputFolder,
-				"Missing\noutput folder", FAILED);
-			return;
-		}
-	}
-
-	// start the download process
+	// construct command strings
+	std::vector<std::string> cmds;
 	try
 	{
+		if (doUpdate)
+			cmds.push_back(" --update");
+		else
 		{
-			std::unique_lock<std::mutex> lk{ mCommandMutex };
-			if (mCommand.load() != KILL)
-			{
-				if (doUpdate) // update command
-				{
-					pi = videodownloadutils::startDownload(data.youtubeDlExePath, " --update");
-				}
-				else if (data.customCommand && !(*data.customCommand).empty()) // custom command download
-				{
-					pi = videodownloadutils::startDownload(data.youtubeDlExePath, *data.customCommand + " " + url);
-				}
-				else // default download setup if no custom command
-				{
-					pi = videodownloadutils::startDownload(url, // url
-						data.outputFolder, // output folder
-						data.youtubeDlExePath, // youtube-dl.exe path
-						std::nullopt, // output filename
-						data.maxDownloads, // max downloads setting
-						data.type); // download type
-				}
-				mState = RUNNING;
-			}
-		}
-
-		videodownloadutils::waitForProcess(pi);
-		
-		{
-			std::unique_lock<std::mutex> lk{ mCommandMutex };
-			mState = STOPPING;
-			videodownloadutils::closeProcess(pi);
+			cmds = videodownloadutils::getCommandQueue(url, data.outputFolder, std::nullopt, data.maxDownloads, data.downloadFormats, data.customCommand);
 		}
 	}
-	catch (std::filesystem::filesystem_error& e)
-	{
-		exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
-			"Invalid path to\nyoutube-dl.exe", FAILED);
-		return;
-	}
-	catch (std::invalid_argument& e)
-	{
-		exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
-			"Missing\nyoutube-dl.exe", FAILED);
-		return;
-	}
-	catch (std::exception& e)
+	catch (std::runtime_error& e)
 	{
 		exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
 			(doUpdate ? std::string("Update") : std::string("Download")) + "\nfailed", FAILED);
 		return;
 	}
 
+	// execute each command sequentially
+	for (const auto cmd : cmds)
+	{
+		// check if output folder exists (we check each time in case this changes between downloads)
+		// std::filesystem can throw an error, so catch that too
+		if (!doUpdate)
+		{
+			bool doesOutputFolderExist = true;
+			try
+			{
+				if (data.outputFolder && !std::filesystem::exists(*data.outputFolder))
+					doesOutputFolderExist = false;
+			}
+			catch (std::filesystem::filesystem_error& e)
+			{
+				exitDownloadProcess("Output folder filesystem error: " + *data.outputFolder + "\n" + std::string(e.what()),
+					"Invalid\noutput folder", FAILED);
+				return;
+			}
+			if (!doesOutputFolderExist)
+			{
+				exitDownloadProcess("Invalid output folder: " + *data.outputFolder,
+					"Missing\noutput folder", FAILED);
+				return;
+			}
+		}
+
+		// start the download process
+		try
+		{
+			{
+				std::unique_lock<std::mutex> lk{ mCommandMutex };
+				if (mCommand.load() != KILL)
+				{
+					pi = videodownloadutils::startDownload(data.youtubeDlExePath, cmd);
+					mState = RUNNING;
+				}
+			}
+
+			videodownloadutils::waitForProcess(pi);
+
+			{
+				std::unique_lock<std::mutex> lk{ mCommandMutex };
+				mState = STOPPING;
+				videodownloadutils::closeProcess(pi);
+			}
+		}
+		catch (std::filesystem::filesystem_error& e)
+		{
+			exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
+				"Invalid path to\nyoutube-dl.exe", FAILED);
+			return;
+		}
+		catch (std::invalid_argument& e)
+		{
+			exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
+				"Missing\nyoutube-dl.exe", FAILED);
+			return;
+		}
+		catch (std::exception& e)
+		{
+			exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
+				(doUpdate ? std::string("Update") : std::string("Download")) + "\nfailed", FAILED);
+			return;
+		}
+
+		// don't process any further commands if we are given a KILL command
+		if (mCommand.load() == KILL)
+			break;
+	}
+
 	if (doUpdate)
-		exitDownloadProcess("Youtube-dl updated.", "Update\nfinished", UPDATED);
+		if (mCommand.load() != KILL)
+			exitDownloadProcess("Youtube-dl updated.", "Update\nfinished", UPDATED);
+		else
+			exitDownloadProcess("Warning! Youtube-dl update was interrupted.", "Update\ninterrupted", FAILED);
 	else
 		exitDownloadProcess(std::nullopt, std::nullopt, SUCCESS);
 }

@@ -5,13 +5,7 @@
 #include <filesystem>
 #include <atlbase.h>
 
-// the type of download to perform
-enum videodownloadutils::DL_TYPE
-{
-	VIDEO,
-	AUDIO_ONLY,
-	VIDEO_ONLY,
-};
+
 
 
 /**
@@ -36,7 +30,7 @@ std::string videodownloadutils::getOutputFolderName(const std::optional<std::str
  * @param[in] optOutputFolder optional output folder. Defaults to desktop if not provided.
  * @param[in] optFilename optional filename. Defaults to "%(title)s.%(ext)s" if not provided.
  * @param[in] optMaxDownloads optional max downloads count. Defaults to 1 if not provided. Set to 0 for infinity.
- * @param[in] type the type of download to perform
+ * @param[in] optType the type of download to perform
  * @return string containing the command
  */
 std::string videodownloadutils::getDownloadCommand(const std::string& url,
@@ -80,6 +74,35 @@ std::string videodownloadutils::getDownloadCommand(const std::string& url,
 
 	return cmd;
 }
+
+/**
+ * Construct a queue of youtube-dl command strings that is passed as command line arguments to youtube-dl
+ *
+ * @param[in] url the url to download from
+ * @param[in] optOutputFolder optional output folder. Defaults to desktop if not provided.
+ * @param[in] optFilename optional filename. Defaults to "%(title)s.%(ext)s" if not provided.
+ * @param[in] optMaxDownloads optional max downloads count. Defaults to 1 if not provided. Set to 0 for infinity.
+ * @param[in] optType set of types of downloads to perform. A command will be created per type.
+ * @param[in] optCustomCommand optional custom command.
+ * @return vector containing all the commands
+ */
+std::vector <std::string> videodownloadutils::getCommandQueue(const std::string& url,
+	const std::optional<std::string>& optOutputFolder,
+	const std::optional<std::string>& optFilename,
+	const std::optional<uint32_t>& optMaxDownloads,
+	const std::unordered_set<DL_TYPE>& optType,
+	const std::optional<std::string>& optCustomCommand)
+{
+	std::vector <std::string> cmds;
+	for (const auto& format : optType)
+		cmds.push_back(videodownloadutils::getDownloadCommand(url, optOutputFolder, optFilename, optMaxDownloads, format));
+
+	if (optCustomCommand && !(*optCustomCommand).empty())
+		cmds.push_back(" " + *optCustomCommand + " " + url);
+
+	return cmds;
+}
+
 
 /**
  * Convert an optional youtube-dl exe path to actual string path.
@@ -154,28 +177,6 @@ PROCESS_INFORMATION videodownloadutils::startDownload(const std::optional<std::s
 	}
 
 	return pi;
-}
-
-/**
- * Constructs a youtube-dl command and launches a process with the command.
- *
- * @param[in] url the url to download from
- * @param[in] optOutputFolder optional output folder. Defaults to desktop if not provided.
- * @param[in] optyoutubeDlExePath optional path to youtube-dl.exe. Default is youtube-dl.exe, found in the same folder as this program.
- * @param[in] optFilename optional filename. Defaults to "%(title)s.%(ext)s" if not provided.
- * @param[in] optMaxDownloads optional max downloads count. Defaults to 1 if not provided. Set to 0 for infinity.
- * @param[in] type the type of download to perform
- * @throws invalid_argument if youtube-dl.exe missing from path, runtime_error if process could not launch, could not retrive exit code, or download failed.
- */
-PROCESS_INFORMATION videodownloadutils::startDownload(const std::string& url,
-	const std::optional<std::string>& optOutputFolder,
-	const std::optional<std::string>& optyoutubeDlExePath,
-	const std::optional<std::string>& optFilename,
-	const std::optional<uint32_t>& optMaxDownloads,
-	const std::optional<uint32_t> type)
-{
-	std::string cmd = getDownloadCommand(url, optOutputFolder, optFilename, optMaxDownloads, type);
-	return startDownload(optyoutubeDlExePath, cmd);
 }
 
 /**

@@ -372,8 +372,25 @@ void MyStreamDeckPlugin::readPayload(contextData_t& data, const json& inPayload,
 			data.outputFolder = convertToNullIfEmpty(inPayload["outputFolder"]);
 		if (inPayload.find("maxDownloads") != inPayload.end())
 			data.maxDownloads = convertToUint32Option(convertToNullIfEmpty(inPayload["maxDownloads"]));
-		if (inPayload.find("type") != inPayload.end())
-			data.type = convertToUint32Option(convertToNullIfEmpty(inPayload["type"]));
+		if (inPayload.find("videoDl") != inPayload.end())
+		{
+			data.downloadFormats.erase(VIDEO);
+			data.downloadFormats.erase(VIDEO_ONLY);
+			if (inPayload["videoDl"].get<std::string>() == "on")
+				data.downloadFormats.insert(VIDEO);
+			else if (inPayload["videoDl"].get<std::string>() == "on_muted")
+				data.downloadFormats.insert(VIDEO_ONLY);
+		}
+		if (inPayload.find("audioDl") != inPayload.end())
+		{
+			if (inPayload["audioDl"].get<std::string>() == "on")
+				data.downloadFormats.insert(AUDIO_ONLY);
+			else
+				data.downloadFormats.erase(AUDIO_ONLY);
+		}
+		if (inPayload.find("imageDl") != inPayload.end())
+			if (inPayload["imageDl"].get<std::string>() == "on")
+				data.attemptImageDl = true;
 		if (inPayload.find("customCommand") != inPayload.end())
 			data.customCommand = convertToNullIfEmpty(inPayload["customCommand"]);
 	}
@@ -445,32 +462,38 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 
 		if (inPayload["command"] == "getSampleCommand")
 		{
-			json j;
+			// construct the command string and send it back to PI
 
-			// construct the command string and send it
+			json j;
 			const contextData_t& data = mVisibleContexts.at(inContext).data;
 			std::string exe = videodownloadutils::getYoutubeDlExePath(data.youtubeDlExePath);
-			std::string cmd;
-			if (data.customCommand)
-				cmd = " " + *data.customCommand + " url";
-			else
-			{
-				try
-				{
-					cmd = videodownloadutils::getDownloadCommand("url",
-						data.outputFolder,
-						std::nullopt,
-						data.maxDownloads,
-						data.type);
-				}
-				catch (std::runtime_error e)
-				{
-					mConnectionManager->LogMessage("Error: context " + inContext + " cannot get download command.");
-					mConnectionManager->LogMessage(e.what());
-				}
-			}
-			j["sampleCommand"] = exe + cmd;
 
+			// first grab all the cmds based on selected options
+			std::vector<std::string> cmds;
+			try
+			{
+				cmds = videodownloadutils::getCommandQueue("url",
+					data.outputFolder,
+					std::nullopt,
+					data.maxDownloads,
+					data.downloadFormats,
+					data.customCommand);
+			}
+			catch (std::runtime_error e)
+			{
+				mConnectionManager->LogMessage("Error: context " + inContext + " cannot get download command.");
+				mConnectionManager->LogMessage(e.what());
+			}
+
+			// group all commands into json string
+			std::string allCmds;
+			for (const auto& cmd : cmds)
+			{
+				allCmds += exe + cmd + "\n";
+			}
+			j["sampleCommand"] = allCmds;
+
+			// send
 			mConnectionManager->SendToPropertyInspector("", inContext, j);
 		}
 		else if (inPayload["command"] == "update")

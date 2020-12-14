@@ -39,10 +39,20 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
             if (payload.label !== undefined)
                 document.getElementById('label_textbox').value = payload.label;
 
-            if (payload.type !== undefined)
-                document.getElementById('download_type_menu').value = payload.type;
-            else
-                document.getElementById('download_type_menu').value = "Video";
+			if (payload.videoDl !== undefined)
+				checkRadioButton('vrdio', payload.videoDl);
+			else
+				checkRadioButton('vrdio', 'on');
+
+			if (payload.audioDl !== undefined)
+				checkRadioButton('ardio', payload.audioDl);
+			else
+				checkRadioButton('ardio', 'off');
+
+			if (payload.imageDl !== undefined)
+				checkRadioButton('irdio', payload.imageDl);
+			else
+				checkRadioButton('irdio', 'off');
 
             if (payload.maxDownloads !== undefined)
                 document.getElementById('max_downloads_textbox').value = payload.maxDownloads;
@@ -82,7 +92,9 @@ function sendCommand(command)
 function updateSettingsToPlugin() {
     payload = {
             'label':document.getElementById('label_textbox').value,
-            'type':document.getElementById('download_type_menu').value,
+			'videoDl':getRadioValue('vrdio'),
+			'audioDl':getRadioValue('ardio'),
+			'imageDl':getRadioValue('irdio'),
             'maxDownloads':document.getElementById('max_downloads_textbox').value,
             'customCommand':document.getElementById('cmd_textbox').value,
             'outputFolder':document.getElementById('output_folder_textbox').value,
@@ -128,5 +140,27 @@ function openUrl(url) {
                 }
         };
         websocket.send(JSON.stringify(json));
+    }
+}
+
+// grabs the value of a radio button group by name
+function getRadioValue(name) {
+    var r = document.getElementsByName(name);
+    for (var i = 0; i < r.length; i++) {
+        if (r[i].checked == true) {
+            return r[i].value;
+        }
+    }
+	return "";
+}
+
+// Checks the radio button matching 'name' and 'value'
+function checkRadioButton(name, value) {
+    var r = document.getElementsByName(name);
+    for (var i = 0; i < r.length; i++) {
+        if (r[i].value == value) {
+            r[i].checked = true;
+            break;
+        }
     }
 }
