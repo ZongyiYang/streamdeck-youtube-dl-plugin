@@ -392,6 +392,8 @@ void MyStreamDeckPlugin::readPayload(contextSettings_t& data, const json& inPayl
 		if (inPayload.find("imageDl") != inPayload.end())
 			if (inPayload["imageDl"].get<std::string>() == "on")
 				data.attemptImageDl = true;
+			else
+				data.attemptImageDl = false;
 		if (inPayload.find("customCommand") != inPayload.end())
 			data.customCommand = convertToNullIfEmpty(inPayload["customCommand"]);
 	}

@@ -25,6 +25,9 @@
     <ClCompile Include="WindowsProcessUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="RedditDlUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
@@ -71,6 +74,12 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="WindowsProcessUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RedditDlUtils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="CurlUtils.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

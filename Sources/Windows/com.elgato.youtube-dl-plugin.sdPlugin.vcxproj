@@ -184,6 +184,8 @@
     <ClInclude Include="..\Common\ESDSDKDefines.h" />
     <ClInclude Include="..\Common\ESDUtilities.h" />
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
+    <ClInclude Include="CurlUtils.hpp" />
+    <ClInclude Include="RedditDlUtils.h" />
     <ClInclude Include="TimerThread.h" />
     <ClInclude Include="ClipboardUtils.hpp" />
     <ClInclude Include="Common.h" />
@@ -238,6 +240,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RedditDlUtils.cpp" />
     <ClCompile Include="WindowsProcessUtils.cpp" />
     <ClCompile Include="YoutubeDlUtils.cpp" />
   </ItemGroup>
