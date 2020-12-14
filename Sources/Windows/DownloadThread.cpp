@@ -13,6 +13,7 @@
 
 #include "DownloadThread.h"
 #include "YoutubeDlUtils.h"
+#include "WindowsProcessUtils.h"
 
 /**
  * Launch a new youtube-dl process.
@@ -113,17 +114,18 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextD
 				std::unique_lock<std::mutex> lk{ mCommandMutex };
 				if (mCommand.load() != KILL)
 				{
-					pi = youtubedlutils::startDownload(data.youtubeDlExePath, cmd);
+					std::string youtubeDlExePath = youtubedlutils::getYoutubeDlExePath(data.youtubeDlExePath);
+					pi = windowsprocessutils::startProcess(youtubeDlExePath, cmd);
 					mState = RUNNING;
 				}
 			}
 
-			youtubedlutils::waitForProcess(pi);
+			windowsprocessutils::waitForProcess(pi);
 
 			{
 				std::unique_lock<std::mutex> lk{ mCommandMutex };
 				mState = STOPPING;
-				youtubedlutils::closeProcess(pi);
+				windowsprocessutils::closeProcess(pi);
 			}
 		}
 		catch (std::filesystem::filesystem_error& e)

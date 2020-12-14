@@ -193,6 +193,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceUtils.hpp" />
     <ClInclude Include="UrlUtils.hpp" />
+    <ClInclude Include="WindowsProcessUtils.h" />
     <ClInclude Include="YoutubeDlUtils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -237,6 +238,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="WindowsProcessUtils.cpp" />
     <ClCompile Include="YoutubeDlUtils.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -33,11 +33,4 @@ namespace youtubedlutils
 		const std::optional<std::string>& optCustomCommand);
 
 	std::string getYoutubeDlExePath(const std::optional<std::string>& optyoutubeDlExePath);
-
-	PROCESS_INFORMATION startDownload(const std::optional<std::string>& optyoutubeDlExePath, const std::string& cmd);
-
-	void waitForProcess(PROCESS_INFORMATION pi);
-	void closeProcess(PROCESS_INFORMATION pi);
-
-	std::string getLastErrorAsString();
 }
