@@ -49,10 +49,10 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 			else
 				checkRadioButton('ardio', 'off');
 
-			if (payload.imageDl !== undefined)
-				checkRadioButton('irdio', payload.imageDl);
+			if (payload.redditDl !== undefined)
+				checkRadioButton('rrdio', payload.redditDl);
 			else
-				checkRadioButton('irdio', 'off');
+				checkRadioButton('rrdio', 'off');
 
             if (payload.maxDownloads !== undefined)
                 document.getElementById('max_downloads_textbox').value = payload.maxDownloads;
@@ -94,7 +94,7 @@ function updateSettingsToPlugin() {
             'label':document.getElementById('label_textbox').value,
 			'videoDl':getRadioValue('vrdio'),
 			'audioDl':getRadioValue('ardio'),
-			'imageDl':getRadioValue('irdio'),
+			'redditDl':getRadioValue('rrdio'),
             'maxDownloads':document.getElementById('max_downloads_textbox').value,
             'customCommand':document.getElementById('cmd_textbox').value,
             'outputFolder':document.getElementById('output_folder_textbox').value,

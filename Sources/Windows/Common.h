@@ -33,5 +33,5 @@ struct contextSettings_t
 	std::optional <uint32_t> maxDownloads = std::nullopt;
 	std::unordered_set <DL_TYPE> downloadFormats = {};
 	std::optional<std::string> customCommand = std::nullopt;
-	bool attemptImageDl = false;
+	bool attemptRedditDl = false;
 };

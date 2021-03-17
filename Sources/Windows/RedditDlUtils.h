@@ -21,5 +21,5 @@ namespace redditdlutils
 	 * @param[in] chunk the memory chunk required by curl
 	 * @throws runtime_error if could not read url for json, json::exception on bad json parse, invalid_argument if reddit content is not of image type
 	 */
-	void getRedditImage(const std::string& url, const std::string& outputFolder, curlutils::MemoryStruct chunk);
+	void downloadRedditContent(const std::string& url, const std::string& outputFolder, curlutils::MemoryStruct& chunk);
 }

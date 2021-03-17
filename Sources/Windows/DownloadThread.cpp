@@ -115,8 +115,8 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 		}
 	}
 
-	// try to download as image
-	if (!doUpdate && data.attemptImageDl)
+	// try to download reddit link
+	if (!doUpdate && data.attemptRedditDl)
 	{
 		bool success = false;
 		std::string errMsg;
@@ -126,7 +126,7 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 		try
 		{
 			mState = RUNNING;
-			redditdlutils::getRedditImage(url, youtubedlutils::getOutputFolderName(data.outputFolder), chunk);
+			redditdlutils::downloadRedditContent(url, youtubedlutils::getOutputFolderName(data.outputFolder), chunk);
 			success = true;
 		}
 		catch (std::exception& e)

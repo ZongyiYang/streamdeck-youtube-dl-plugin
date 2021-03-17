@@ -16,7 +16,7 @@
 #include "../Vendor/json/src/json.hpp"
 
 
-void redditdlutils::getRedditImage(const std::string& url, const std::string& outputFolder, curlutils::MemoryStruct chunk)
+void redditdlutils::downloadRedditContent(const std::string& url, const std::string& outputFolder, curlutils::MemoryStruct& chunk)
 {
 	// first get the json metadata from the reddit page using curl
 	std::unique_ptr<std::string> htmlData;

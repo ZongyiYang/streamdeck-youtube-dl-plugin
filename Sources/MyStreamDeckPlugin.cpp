@@ -395,11 +395,11 @@ void MyStreamDeckPlugin::readPayload(contextSettings_t& data, const json& inPayl
 			else
 				data.downloadFormats.erase(AUDIO_ONLY);
 		}
-		if (inPayload.find("imageDl") != inPayload.end())
-			if (inPayload["imageDl"].get<std::string>() == "on")
-				data.attemptImageDl = true;
+		if (inPayload.find("redditDl") != inPayload.end())
+			if (inPayload["redditDl"].get<std::string>() == "on")
+				data.attemptRedditDl = true;
 			else
-				data.attemptImageDl = false;
+				data.attemptRedditDl = false;
 		if (inPayload.find("customCommand") != inPayload.end())
 			data.customCommand = convertToNullIfEmpty(inPayload["customCommand"]);
 	}

@@ -105,7 +105,7 @@ namespace curlutils
 	 * @param[in] chunk the MemoryStruct used by the callback. Must be allocated and deallocated outside this function
 	 * @throws runtime_error on failure to download file
 	**/
-	static void downloadFile(const std::string& url, const std::string& path, MemoryStruct chunk)
+	static void downloadFile(const std::string& url, const std::string& path, MemoryStruct& chunk)
 	{
 		CURL* curl;
 
