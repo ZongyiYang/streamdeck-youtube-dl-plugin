@@ -166,17 +166,17 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 				if (mCommand.load() != KILL)
 				{
 					std::string youtubeDlExePath = youtubedlutils::getYoutubeDlExePath(data.youtubeDlExePath);
-					pi = windowsprocessutils::startProcess(youtubeDlExePath, cmd);
+					mPi = windowsprocessutils::startProcess(youtubeDlExePath, cmd);
 					mState = RUNNING;
 				}
 			}
 
-			windowsprocessutils::waitForProcess(pi);
+			windowsprocessutils::waitForProcess(mPi);
 
 			{
 				std::unique_lock<std::mutex> lk{ mCommandMutex };
 				mState = STOPPING;
-				windowsprocessutils::closeProcess(pi);
+				windowsprocessutils::closeProcess(mPi);
 			}
 		}
 		catch (std::filesystem::filesystem_error& e)

@@ -69,9 +69,9 @@ private:
 	std::unordered_map <std::string, downloadData_t> mActiveDownloads;
 
 	// these are used for waking main thread for updates
-	std::mutex cvMutex;
-	std::condition_variable cv;
-	std::queue<DownloadThread::threadData_t> results;
+	std::mutex mCvMutex;
+	std::condition_variable mCv;
+	std::queue<DownloadThread::threadData_t> mResults;
 
 	void readPayload(contextSettings_t& data, const json& inPayload, const std::unique_lock<std::mutex>& lk);
 	void runPICommands(const std::string& inContext, const json& inPayload, const std::unique_lock<std::mutex>& lk);

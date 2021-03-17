@@ -56,8 +56,8 @@ public:
 	~DownloadThread()
 	{
 		kill();
-		if (t.joinable())
-			t.join();
+		if (mT.joinable())
+			mT.join();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public:
 
 		mData.context = inContext;
 
-		t = std::thread(&DownloadThread::launchDownloadProcess, this, url, data, doUpdate,
+		mT = std::thread(&DownloadThread::launchDownloadProcess, this, url, data, doUpdate,
 			            std::ref(cvMutex), std::ref(cv), std::ref(results));
 	}
 
@@ -93,7 +93,7 @@ public:
 		mCommand = DETACH;
 		mPtr = shared_from_this();
 
-		t.detach();
+		mT.detach();
 	}
 
 	void kill()
@@ -102,8 +102,8 @@ public:
 			std::unique_lock<std::mutex> lk{ mCommandMutex };
 			mCommand = KILL;
 			if (mState.load() == RUNNING)
-				if (pi.hProcess != NULL)
-					TerminateProcess(pi.hProcess, 0);
+				if (mPi.hProcess != NULL)
+					TerminateProcess(mPi.hProcess, 0);
 		}
 	}
 
@@ -122,9 +122,9 @@ private:
 	// command to exit download loop
 	std::mutex mCommandMutex;
 	std::atomic<flags_t> mCommand = CONTINUE;
-	PROCESS_INFORMATION pi;
+	PROCESS_INFORMATION mPi;
 
-	std::thread t;
+	std::thread mT;
 	std::mutex mDataMutex;
 	threadData_t mData;
 

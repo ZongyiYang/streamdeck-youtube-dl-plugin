@@ -27,8 +27,8 @@ MyStreamDeckPlugin::~MyStreamDeckPlugin()
 	// send stop signal to UI thread
 	mIsRunning = false;
 	{
-		std::unique_lock<std::mutex>cvLk(cvMutex);
-		cv.notify_all();
+		std::unique_lock<std::mutex>cvLk(mCvMutex);
+		mCv.notify_all();
 	}
 
 	if (mDlMonitor.joinable())
@@ -97,7 +97,7 @@ void MyStreamDeckPlugin::cleanupDownloads(const std::string& context, const std:
 }
 
 /**
- * Helper function for downloadMonitor. Reads results queue and updates the data for contexts that are modified
+ * Helper function for downloadMonitor. Reads mResults queue and updates the data for contexts that are modified
  *
  * @param[in] lk the lock for mutex mVisibleContextsMutex
  * @return set of contexts that had something changed
@@ -109,10 +109,10 @@ std::unordered_set <std::string> MyStreamDeckPlugin::getModifiedContexts(const s
 	assert(lk.mutex() == &mVisibleContextsMutex);
 
 	std::unordered_set <std::string> modifiedContexts;
-	while (!results.empty())
+	while (!mResults.empty())
 	{
-		DownloadThread::threadData_t threadData = results.front();
-		results.pop();
+		DownloadThread::threadData_t threadData = mResults.front();
+		mResults.pop();
 		modifiedContexts.insert(threadData.context);
 
 		switch (threadData.status)
@@ -146,15 +146,15 @@ std::unordered_set <std::string> MyStreamDeckPlugin::getModifiedContexts(const s
 }
 
 /**
- * Thead function that waits for download completion signals, processes results, and updates UI
+ * Thead function that waits for download completion signals, processes mResults, and updates UI
  */
 void MyStreamDeckPlugin::downloadMonitor()
 {
 	while (mIsRunning.load())
 	{
 		// wait for wake signal from threads
-		std::unique_lock<std::mutex>cvLk(cvMutex);
-		cv.wait(cvLk, [&] {return !results.empty(); });
+		std::unique_lock<std::mutex>cvLk(mCvMutex);
+		mCv.wait(cvLk, [&] {return !mResults.empty(); });
 
 		std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
 		// set of contexts that changed
@@ -226,7 +226,7 @@ void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const conte
 	if (mActiveDownloads.find(inContext) == mActiveDownloads.end())
 		mActiveDownloads.insert({ inContext, {} });
 	std::shared_ptr<DownloadThread> dl = std::make_shared<DownloadThread>();
-	dl->start(url, data, inContext, doUpdate, cvMutex, cv, results);
+	dl->start(url, data, inContext, doUpdate, mCvMutex, mCv, mResults);
 	mActiveDownloads.at(inContext).threads.push_back(std::move(dl));
 }
 
@@ -290,10 +290,16 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 		// Cannot launch a new download if we are updating
 		if (mIsUpdating.load())
 		{
-			mConnectionManager->LogMessage("Error: cannot start download, update in progress.");
-			lastErrorMsg = "Error: update\nin progress";
-			updateUI(inContext, lk);
-			return;
+			// double check if there are no active tasks, since update could have failed
+			if (mActiveDownloads.size() == 0)
+				mIsUpdating = false;
+			else
+			{
+				mConnectionManager->LogMessage("Error: cannot start download, update in progress.");
+				lastErrorMsg = "Error: update\nin progress";
+				updateUI(inContext, lk);
+				return;
+			}
 		}
 
 		// get clipboard text
@@ -505,7 +511,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 			if (mActiveDownloads.size() > 0)
 			{
 				lastErrorMsg = "youtube-dl\nin use.";
-				mConnectionManager->LogMessage("Error: context " + inContext + " requested update but downloads are still pending.");
+				mConnectionManager->LogMessage("Error: context " + inContext + " requested update but jobs are still pending.");
 			}
 			else
 			{
