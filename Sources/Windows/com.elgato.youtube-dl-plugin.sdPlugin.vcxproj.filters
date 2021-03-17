@@ -28,6 +28,9 @@
     <ClCompile Include="RedditDlUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="UrlUtils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
@@ -35,9 +38,6 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="ResourceUtils.hpp">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="UrlUtils.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\EPLJSONUtils.h">
@@ -80,6 +80,9 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="CurlUtils.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="UrlUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>

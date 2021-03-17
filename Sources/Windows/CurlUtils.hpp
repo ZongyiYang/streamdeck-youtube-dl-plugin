@@ -10,6 +10,8 @@
 #define CURL_STATICLIB
 #include <curl\curl.h>
 
+#include "UrlUtils.h"
+
 #include <string>
 #include <fstream>
 
@@ -69,6 +71,9 @@ namespace curlutils
 	**/
 	static bool readHTML(const std::string& url, std::string* data)
 	{
+		if (!urlutils::isValidUrl(url))
+			return false;
+
 		CURL* curl;
 		data->clear();
 

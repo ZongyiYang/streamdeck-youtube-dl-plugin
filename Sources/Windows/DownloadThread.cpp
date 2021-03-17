@@ -116,7 +116,7 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 	}
 
 	// try to download as image
-	if (data.attemptImageDl)
+	if (!doUpdate && data.attemptImageDl)
 	{
 		bool success = false;
 		std::string errMsg;
@@ -134,20 +134,21 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 			errMsg = "Image download failed:\n" + std::string(e.what());
 		}
 
-		mState = STOPPING;
 		if (chunk.memory)
 			free(chunk.memory);
 
 		// if image dl was successful, no need to call youtube-dl, just exit as success
 		if (success == true)
 		{
+			mState = STOPPING;
 			exitDownloadProcess(std::nullopt, std::nullopt, SUCCESS);
 			return;
 		}
 		else if (cmds.size() == 0)
 		{
 			// if we are only trying to download images and are not calling youtube-dl, but we failed,
-			// then return errror messages
+			// then return error messages
+			mState = STOPPING;
 			exitDownloadProcess(errMsg,
 				"Image download\nfailed", FAILED);
 			return;
