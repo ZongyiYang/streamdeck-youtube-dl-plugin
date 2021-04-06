@@ -423,10 +423,11 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string& inAction, const 
 		readPayload(newButtonData.data, inPayload["settings"], lk);
 	newButtonData.buttonTimer.reset(new TimerThread());
 
-	mVisibleContexts.emplace( inContext, std::move(newButtonData) );
-
 	if (!mIsRunning.load())
 		newButtonData.lastErrorMsg = "Error: Bad\nInitialization";
+
+	mVisibleContexts.emplace( inContext, std::move(newButtonData) );
+
 	updateUI(inContext, lk);
 }
 
