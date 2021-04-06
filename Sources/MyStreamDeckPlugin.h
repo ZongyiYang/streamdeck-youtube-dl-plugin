@@ -81,4 +81,9 @@ private:
 	void cleanupDownloads(const std::string& context, const std::unique_lock<std::mutex>& lk);
 	std::unordered_set <std::string> getModifiedContexts(const std::unique_lock<std::mutex>& lk);
 	void updateUI(const std::string & inContext, const std::unique_lock<std::mutex>& lk);
+
+	bool contextFound(const std::string& context)
+	{
+		return mConnectionManager != nullptr && mVisibleContexts.find(context) != mVisibleContexts.end();
+	}
 };

@@ -184,7 +184,7 @@ void MyStreamDeckPlugin::updateUI(const std::string& inContext, const std::uniqu
 	assert(lk.owns_lock());
 	assert(lk.mutex() == &mVisibleContextsMutex);
 
-	if (mConnectionManager != nullptr && mVisibleContexts.find(inContext) != mVisibleContexts.end())
+	if (contextFound(inContext))
 	{
 		std::string label = "";
 		std::string errMsg = "\n";
@@ -227,118 +227,118 @@ void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const conte
 	mActiveDownloads.at(inContext).threads.push_back(std::move(dl));
 }
 
-void MyStreamDeckPlugin::KeyDownForAction(const std::string& inAction, const std::string& inContext, const json &inPayload, const std::string& inDeviceID)
+void MyStreamDeckPlugin::KeyDownForAction(const std::string& inAction, const std::string& inContext, const json& inPayload, const std::string& inDeviceID)
 {
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
-	if (mConnectionManager != nullptr && mVisibleContexts.find(inContext) != mVisibleContexts.end())
-	{
-		mVisibleContexts.at(inContext).buttonTimer->stop();
+	if (contextFound(inContext))
+		return;
 
-		// get output folder name
-		std::string folder = youtubedlutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
+	mVisibleContexts.at(inContext).buttonTimer->stop();
 
-		// start timer that opens this folder once time is reached
-		const uint32_t LONG_PRESS_TIME_MILLIS = 500;
-		mVisibleContexts.at(inContext).buttonTimer->start(LONG_PRESS_TIME_MILLIS, [folder]()
+	// get output folder name
+	std::string folder = youtubedlutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
+
+	// start timer that opens this folder once time is reached
+	const uint32_t LONG_PRESS_TIME_MILLIS = 500;
+	mVisibleContexts.at(inContext).buttonTimer->start(LONG_PRESS_TIME_MILLIS, [folder]()
+		{
+			if (std::filesystem::exists(folder))
 			{
-				if (std::filesystem::exists(folder))
-				{
-					fileutils::openFolder(folder);
-					return true;
-				}
-				else
-					return false;
-			});
-	}
+				fileutils::openFolder(folder);
+				return true;
+			}
+			else
+				return false;
+		});
 }
 
 
-void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::string& inContext, const json &inPayload, const std::string& inDeviceID)
+void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::string& inContext, const json& inPayload, const std::string& inDeviceID)
 {
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
 
-	if (mConnectionManager != nullptr && mVisibleContexts.find(inContext) != mVisibleContexts.end())
+	if (contextFound(inContext))
+		return;
+
+	if (!mIsRunning.load())
+		return;
+
+	const contextSettings_t& data = mVisibleContexts.at(inContext).data;
+	std::optional<std::string>& lastErrorMsg = mVisibleContexts.at(inContext).lastErrorMsg;
+
+	// check if button timer completed
+	if (mVisibleContexts.at(inContext).buttonTimer != nullptr)
 	{
-		if (!mIsRunning.load())
-			return;
+		mVisibleContexts.at(inContext).buttonTimer->stop();
 
-		const contextSettings_t& data = mVisibleContexts.at(inContext).data;
-		std::optional<std::string>& lastErrorMsg = mVisibleContexts.at(inContext).lastErrorMsg;
-
-		// check if button timer completed
-		if (mVisibleContexts.at(inContext).buttonTimer != nullptr)
-		{
-			mVisibleContexts.at(inContext).buttonTimer->stop();
-
-			// If button press timer completed, it means the press was longer than LONG_PRESS_TIME_MILLIS
-			// This indicates that a long press was done and folder was opened. In this case don't execute anything, just return
-			if (mVisibleContexts.at(inContext).buttonTimer->isCompleted())
-				if (mVisibleContexts.at(inContext).buttonTimer->isSuccessful())
-					return;
-				else
-				{
-					mConnectionManager->LogMessage("Error: cannot open folder: " + youtubedlutils::getOutputFolderName(data.outputFolder));
-					lastErrorMsg = "Error: cannot\nopen folder";
-					updateUI(inContext, lk);
-					return;
-				}
-		}
-
-		// Cannot launch a new download if we are updating
-		if (mIsUpdating.load())
-		{
-			// double check if there are no active tasks, since update could have failed
-			if (mActiveDownloads.size() == 0)
-				mIsUpdating = false;
+		// If button press timer completed, it means the press was longer than LONG_PRESS_TIME_MILLIS
+		// This indicates that a long press was done and folder was opened. In this case don't execute anything, just return
+		if (mVisibleContexts.at(inContext).buttonTimer->isCompleted())
+			if (mVisibleContexts.at(inContext).buttonTimer->isSuccessful())
+				return;
 			else
 			{
-				mConnectionManager->LogMessage("Error: cannot start download, update in progress.");
-				lastErrorMsg = "Error: update\nin progress";
+				mConnectionManager->LogMessage("Error: cannot open folder: " + youtubedlutils::getOutputFolderName(data.outputFolder));
+				lastErrorMsg = "Error: cannot\nopen folder";
 				updateUI(inContext, lk);
 				return;
 			}
-		}
+	}
 
-		// get clipboard text
-		std::string clipboardText;
-		try
-		{
-			clipboardText = clipboardutils::getClipboardText();
-		}
-		catch (std::runtime_error& e)
-		{
-			mConnectionManager->LogMessage("Invalid clipboard:");
-			mConnectionManager->LogMessage(e.what());
-			lastErrorMsg = "Invalid\nclipboard";
-			updateUI(inContext, lk);
-			return;
-		}
-
-		// check if clipboard text is a URL
-		if (!urlutils::isValidUrl(clipboardText.c_str()))
-		{
-			mConnectionManager->LogMessage("Invalid URL: " + clipboardText);
-			lastErrorMsg = "Invalid\nURL";
-			updateUI(inContext, lk);
-			return;
-		}
-
-		// load settings
-		contextSettings_t settings{};
-		if (inPayload.find("settings") != inPayload.end())
-			readPayload(settings, inPayload["settings"], lk);
+	// Cannot launch a new download if we are updating
+	if (mIsUpdating.load())
+	{
+		// double check if there are no active tasks, since update could have failed
+		if (mActiveDownloads.size() == 0)
+			mIsUpdating = false;
 		else
 		{
-			mConnectionManager->LogMessage("KeyUpForAction Error: No Settings");
-			lastErrorMsg = "Failed to\nreceive settings";
+			mConnectionManager->LogMessage("Error: cannot start download, update in progress.");
+			lastErrorMsg = "Error: update\nin progress";
 			updateUI(inContext, lk);
 			return;
 		}
-		// spawn a new download task
-		lastErrorMsg = std::nullopt; // clear error
-		submitDownloadTask(clipboardText, settings, inContext, false, lk);
-		updateUI(inContext, lk);
 	}
+
+	// get clipboard text
+	std::string clipboardText;
+	try
+	{
+		clipboardText = clipboardutils::getClipboardText();
+	}
+	catch (std::runtime_error& e)
+	{
+		mConnectionManager->LogMessage("Invalid clipboard:");
+		mConnectionManager->LogMessage(e.what());
+		lastErrorMsg = "Invalid\nclipboard";
+		updateUI(inContext, lk);
+		return;
+	}
+
+	// check if clipboard text is a URL
+	if (!urlutils::isValidUrl(clipboardText.c_str()))
+	{
+		mConnectionManager->LogMessage("Invalid URL: " + clipboardText);
+		lastErrorMsg = "Invalid\nURL";
+		updateUI(inContext, lk);
+		return;
+	}
+
+	// load settings
+	contextSettings_t settings{};
+	if (inPayload.find("settings") != inPayload.end())
+		readPayload(settings, inPayload["settings"], lk);
+	else
+	{
+		mConnectionManager->LogMessage("KeyUpForAction Error: No Settings");
+		lastErrorMsg = "Failed to\nreceive settings";
+		updateUI(inContext, lk);
+		return;
+	}
+	// spawn a new download task
+	lastErrorMsg = std::nullopt; // clear error
+	submitDownloadTask(clipboardText, settings, inContext, false, lk);
+	updateUI(inContext, lk);
 }
 
 /**
@@ -457,14 +457,11 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 	assert(lk.owns_lock());
 	assert(lk.mutex() == &mVisibleContextsMutex);
 
-	if (mConnectionManager == nullptr)
+	if (!contextFound(inContext))
 		return;
 
 	if (inPayload.find("command") != inPayload.end())
 	{
-		if (mVisibleContexts.find(inContext) == mVisibleContexts.end())
-			return;
-
 		std::optional<std::string>& lastErrorMsg = mVisibleContexts.at(inContext).lastErrorMsg;
 
 		if (inPayload["command"] == "getSampleCommand")
@@ -549,7 +546,7 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string& inAction, const std::st
 {
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
 	// on settings change, store the new settings
-	if (mVisibleContexts.find(inContext) != mVisibleContexts.end())
+	if (contextFound(inContext))
 		readPayload(mVisibleContexts.at(inContext).data, inPayload, lk);
 
 	runPICommands(inContext, inPayload, lk);
