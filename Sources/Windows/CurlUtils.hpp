@@ -35,7 +35,7 @@ namespace curlutils
 	 * Struct for curl download
 	**/
 	struct MemoryStruct {
-		unsigned char* memory;
+		uint8_t* memory;
 		size_t size;
 	};
 
@@ -47,13 +47,14 @@ namespace curlutils
 		std::size_t realsize = size * nmemb;
 		struct MemoryStruct* mem = (struct MemoryStruct*)userp;
 
-		mem->memory = (unsigned char*)realloc(mem->memory, mem->size + realsize + 1);
-		if (mem->memory == NULL) {
+		uint8_t * newMem = static_cast<uint8_t*>(realloc(mem->memory, mem->size + realsize + 1));
+		if (newMem == NULL) {
 			/* out of memory! */
 			throw std::runtime_error("Error: not enough memory (realloc returned NULL)\n");
 			return 0;
 		}
-
+		
+		mem->memory = newMem;
 		memcpy(&(mem->memory[mem->size]), contents, realsize);
 		mem->size += realsize;
 		mem->memory[mem->size] = 0;

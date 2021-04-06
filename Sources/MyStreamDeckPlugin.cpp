@@ -193,15 +193,12 @@ void MyStreamDeckPlugin::updateUI(const std::string& inContext, const std::uniqu
 		if (mVisibleContexts.at(inContext).lastErrorMsg)
 			errMsg = *mVisibleContexts.at(inContext).lastErrorMsg;
 
-		uint32_t totalThreads = 0;
-		uint32_t successfulThreads = 0;
-		uint32_t failedThreads = 0;
 		uint32_t pendingThreads = 0;
 		if (mActiveDownloads.find(inContext) != mActiveDownloads.end())
 		{
-			totalThreads = mActiveDownloads.at(inContext).threads.size();
-			successfulThreads = mActiveDownloads.at(inContext).successCount;
-			failedThreads = mActiveDownloads.at(inContext).failureCount;
+			uint32_t totalThreads = mActiveDownloads.at(inContext).threads.size();
+			uint32_t successfulThreads = mActiveDownloads.at(inContext).successCount;
+			uint32_t failedThreads = mActiveDownloads.at(inContext).failureCount;
 			pendingThreads = totalThreads - successfulThreads - failedThreads;
 		}
 		mConnectionManager->SetTitle(label + "\nPending: " + std::to_string(pendingThreads) + "\n" + errMsg, inContext, kESDSDKTarget_HardwareAndSoftware);
@@ -489,7 +486,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 					data.downloadFormats,
 					data.customCommand);
 			}
-			catch (std::runtime_error e)
+			catch (std::runtime_error &e)
 			{
 				mConnectionManager->LogMessage("Error: context " + inContext + " cannot get download command.");
 				mConnectionManager->LogMessage(e.what());
@@ -508,7 +505,6 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 		}
 		else if (inPayload["command"] == "update")
 		{
-			contextSettings_t & data = mVisibleContexts.at(inContext).data;
 			if (mActiveDownloads.size() > 0)
 			{
 				lastErrorMsg = "youtube-dl\nin use.";
@@ -516,6 +512,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 			}
 			else
 			{
+				contextSettings_t& data = mVisibleContexts.at(inContext).data;
 				mIsUpdating = true;
 				lastErrorMsg = "Updating\n";
 				submitDownloadTask("", data, inContext, true, lk);
