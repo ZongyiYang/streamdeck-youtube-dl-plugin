@@ -78,5 +78,6 @@ Executing this file will install the plugin to your Stream Deck.
 
 If you like the plugin and want to give a small donation, you can use the links below. Thanks!
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6ee92c7c736a4f13875c3d3707c426f2)](https://app.codacy.com/gh/ZongyiYang/streamdeck-youtube-dl-plugin?utm_source=github.com&utm_medium=referral&utm_content=ZongyiYang/streamdeck-youtube-dl-plugin&utm_campaign=Badge_Grade_Settings)
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=95B98SPYFY3LS&currency_code=USD)
 ![](Resrouces/DonateQR.png)
