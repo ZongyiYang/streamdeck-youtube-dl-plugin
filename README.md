@@ -9,6 +9,8 @@ This plugin differs from a SuperMacro solution in the following ways:
 -	By holding the button, this plugin opens the output folder to allow easy access to recent downloads.
 -	This plugin also downloads images and videos from reddit if given a reddit URL.
 
+**Note: it is suggested that the 'Update' button in 'Advanced Settings' is pressed to update Youtube-dl before use since the default one bundled with this application is likely outdated. Youtube/Twitch/etc often changes, and Youtube-dl will require an update in order to handle whatever changed in the API.**
+
 ![](example.png)
 
 # Use cases:
@@ -73,6 +75,10 @@ Causes of errors include:
 Download the file `com.elgato.streamdeck-youtube-dl-plugin.streamDeckPlugin` from the Release folder.
 
 Executing this file will install the plugin to your Stream Deck.
+
+After placing this plugin on your Stream Deck, it is required that the 'Update' button in the 'Advanced Settings' menu of this button is pressed to update Youtube-dl. The older version of Youtube-dl bundeled with this plugin is likely outdated and is only there to allow for a easy first time update.
+
+It is recommended that this 'Update' button is pressed if downloads from Youtube/Twitch/etc stop working (check with the [Youtube-dl github](https://github.com/ytdl-org/youtube-dl)).
 
 # Support the Developer
 
