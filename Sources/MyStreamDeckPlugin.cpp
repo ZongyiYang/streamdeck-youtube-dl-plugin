@@ -55,7 +55,7 @@ bool MyStreamDeckPlugin::initYoutubeDl()
 {
 	try
 	{
-		resourceutils::extractResource(IDR_EXE1, "EXE", "youtube-dl.exe");
+		resourceutils::extractResource(IDR_EXE1, "EXE", "yt-dlp.exe"); // yt-dlp is now preffered over youtube-dl which may be abandoned
 		resourceutils::extractResource(IDR_EXE2, "EXE", "ffmpeg.exe");
 	}
 	catch (std::runtime_error& e)
@@ -121,7 +121,7 @@ std::unordered_set <std::string> MyStreamDeckPlugin::getModifiedContexts(const s
 			mIsUpdating = false;
 			mActiveDownloads.at(threadData.context).successCount++;
 			if (mConnectionManager != nullptr)
-				mConnectionManager->LogMessage("Youtube-dl updated.");
+				mConnectionManager->LogMessage("yt-dlp updated.");
 			break;
 		case DownloadThread::SUCCESS:
 			mActiveDownloads.at(threadData.context).successCount++;
@@ -130,7 +130,7 @@ std::unordered_set <std::string> MyStreamDeckPlugin::getModifiedContexts(const s
 			mActiveDownloads.at(threadData.context).failureCount++;
 			if (mConnectionManager != nullptr)
 			{
-				mConnectionManager->LogMessage("Failed youtube-dl at context: " + threadData.context);
+				mConnectionManager->LogMessage("Failed yt-dlp at context: " + threadData.context);
 				if (threadData.log)
 					mConnectionManager->LogMessage("Log: " + *threadData.log);
 			}
@@ -230,7 +230,7 @@ void MyStreamDeckPlugin::submitDownloadTask(const std::string & url, const conte
 void MyStreamDeckPlugin::KeyDownForAction(const std::string& inAction, const std::string& inContext, const json& inPayload, const std::string& inDeviceID)
 {
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
-	if (contextFound(inContext))
+	if (!contextFound(inContext))
 		return;
 
 	mVisibleContexts.at(inContext).buttonTimer->stop();
@@ -257,7 +257,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string& inAction, const std::
 {
 	std::unique_lock<std::mutex>lk(mVisibleContextsMutex);
 
-	if (contextFound(inContext))
+	if (!contextFound(inContext))
 		return;
 
 	if (!mIsRunning.load())
@@ -470,7 +470,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 
 			json j;
 			const contextSettings_t& data = mVisibleContexts.at(inContext).data;
-			std::string exe = youtubedlutils::getYoutubeDlExePath(data.youtubeDlExePath);
+			std::string exe = youtubedlutils::getDownloaderExePath(data.youtubeDlExePath);
 
 			// first grab all the cmds based on selected options
 			std::vector<std::string> cmds;

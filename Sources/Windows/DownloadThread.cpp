@@ -27,7 +27,7 @@
  * @param[in] cv the condition variable to wake on completion
  * @param[in] results the queue to place finished results data
  */
-void DownloadThread::launchDownloadProcess(const std::string url, const contextSettings_t data, const bool doUpdate,
+void DownloadThread::launchDownloadProcess(const std::string& url, const contextSettings_t& data, const bool doUpdate,
 										   std::mutex& cvMutex, std::condition_variable& cv,
 										   std::queue<threadData_t>& results)
 {
@@ -165,7 +165,7 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 				std::unique_lock<std::mutex> lk{ mCommandMutex };
 				if (mCommand.load() != KILL)
 				{
-					std::string youtubeDlExePath = youtubedlutils::getYoutubeDlExePath(data.youtubeDlExePath);
+					std::string youtubeDlExePath = youtubedlutils::getDownloaderExePath(data.youtubeDlExePath);
 					mPi = windowsprocessutils::startProcess(youtubeDlExePath, cmd);
 					mState = RUNNING;
 				}
@@ -181,19 +181,19 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 		}
 		catch (std::filesystem::filesystem_error& e)
 		{
-			exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
-				"Invalid path to\nyoutube-dl.exe", FAILED);
+			exitDownloadProcess("yt-dlp failed:\n" + std::string(e.what()),
+				"Invalid path to\nyt-dlp.exe", FAILED);
 			return;
 		}
 		catch (std::invalid_argument& e)
 		{
-			exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
-				"Missing\nyoutube-dl.exe", FAILED);
+			exitDownloadProcess("yt-dlp failed:\n" + std::string(e.what()),
+				"Missing\nyt-dlp.exe", FAILED);
 			return;
 		}
 		catch (std::exception& e)
 		{
-			exitDownloadProcess("Youtube-dl failed:\n" + std::string(e.what()),
+			exitDownloadProcess("yt-dlp failed:\n" + std::string(e.what()),
 				(doUpdate ? std::string("Update") : std::string("Download")) + "\nfailed", FAILED);
 			return;
 		}
@@ -205,9 +205,9 @@ void DownloadThread::launchDownloadProcess(const std::string url, const contextS
 
 	if (doUpdate)
 		if (mCommand.load() != KILL)
-			exitDownloadProcess("Youtube-dl updated.", "Update\nfinished", UPDATED);
+			exitDownloadProcess("yt-dlp updated.", "Update\nfinished", UPDATED);
 		else
-			exitDownloadProcess("Warning! Youtube-dl update was interrupted.", "Update\ninterrupted", FAILED);
+			exitDownloadProcess("Warning! yt-dlp update was interrupted.", "Update\ninterrupted", FAILED);
 	else
 		exitDownloadProcess(std::nullopt, std::nullopt, SUCCESS);
 }

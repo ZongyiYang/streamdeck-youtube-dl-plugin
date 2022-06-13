@@ -23,7 +23,7 @@
   "Name": "Youtube-dl Plugin", 
   "Icon": "pluginIcon", 
   "URL": "https://github.com/ZongyiYang/streamdeck-youtube-dl-plugin", 
-  "Version": "1.0",
+  "Version": "1.1",
   "OS": [
     {
         "Platform": "windows", 

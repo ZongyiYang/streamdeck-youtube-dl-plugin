@@ -252,7 +252,7 @@
     <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.html" />
     <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.js" />
     <None Include="..\Vendor\ffmpeg.exe" />
-    <None Include="..\Vendor\youtube-dl.exe" />
+    <None Include="..\Vendor\yt-dlp.exe" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,7 @@
 # Description
 
+**NOTE: Youtube-DL is a bit slow to update (project may be abandoned). This causes issues such as downloads being extremely slow or not working at all. The recommended drop-in replacement is [yt-dlp](https://github.com/yt-dlp/yt-dlp). Therefore, as of release 1.1, the internal exe bundled with this plugin is now yt-dlp instead of youtube-dl.**
+
 This is a Windows plugin for the Elgato Stream Deck that executes youtube-dl on a URL link copied to the clipboard once the button is pressed. It also has the additional feature of downloading media content from reddit URLs.
 
 This plugin differs from a SuperMacro solution in the following ways:
@@ -76,15 +78,22 @@ Download the file `com.elgato.streamdeck-youtube-dl-plugin.streamDeckPlugin` fro
 
 Executing this file will install the plugin to your Stream Deck.
 
-After placing this plugin on your Stream Deck, it is required that the 'Update' button in the 'Advanced Settings' menu of this button is pressed to update Youtube-dl. The older version of Youtube-dl bundeled with this plugin is likely outdated and is only there to allow for a easy first time update.
+After placing this plugin on your Stream Deck, it is required that the `Update` button in the `Advanced Settings` menu of this button is pressed to update Youtube-dl. The older version of Youtube-dl bundeled with this plugin is likely outdated and is only there to allow for a easy first time update.
 
-It is recommended that this 'Update' button is pressed if downloads from Youtube/Twitch/etc stop working (check with the [Youtube-dl github](https://github.com/ytdl-org/youtube-dl)).
+It is recommended that this `Update` button is pressed if downloads from Youtube/Twitch/etc stop working (check with the [Youtube-dl github](https://github.com/ytdl-org/youtube-dl)).
+
+# Developer Tools
+
+The script `setup.bat` downloads ffmpeg and yt-dlp exes from their repos and places them in `Sources\Vendor`.
+
+The script `reinstall.bat` repackages a plugin (that must be already built and located in `Sources\Windows\Release`) using the Elgato provided `DistributionTool.exe` into a plugin file usable by the Stream Deck device. It also shuts down the Stream Deck application, removes any instance of the previously installed plugin, reinstalls it, and restarts the Stream Deck application.
 
 # Support the Developer
 
 If you like the plugin and want to give a small donation, you can use the links below. Thanks!
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=95B98SPYFY3LS&currency_code=USD)
-![](Resrouces/DonateQR.png)
+
+[![](Resources/DonateQR.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=95B98SPYFY3LS&currency_code=USD)
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6ee92c7c736a4f13875c3d3707c426f2)](https://app.codacy.com/gh/ZongyiYang/streamdeck-youtube-dl-plugin?utm_source=github.com&utm_medium=referral&utm_content=ZongyiYang/streamdeck-youtube-dl-plugin&utm_campaign=Badge_Grade_Settings)
