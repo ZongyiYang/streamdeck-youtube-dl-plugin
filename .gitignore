@@ -1,10 +1,11 @@
 Sources/Windows/Debug
 Sources/Windows/Release
 Sources/Windows/.vs
-Sources/Windows/com.elgato.vreddit_downloader.sdPlugin.vcxproj.user
+Sources/Windows/*.aps
 vim.exe.stackdump
 ffmpeg.exe
 youtube-dl.exe
+yt-dlp.exe
 Sources/youtube-dl-plugin-tests/Release
 Sources/youtube-dl-plugin-tests/Debug
 Sources/Windows/packages

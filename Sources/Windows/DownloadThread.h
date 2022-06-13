@@ -128,7 +128,7 @@ private:
 	std::mutex mDataMutex;
 	threadData_t mData;
 
-	void launchDownloadProcess(const std::string url, const contextSettings_t data, const bool doUpdate,
+	void launchDownloadProcess(const std::string& url, const contextSettings_t& data, const bool doUpdate,
 		std::mutex& cvMutex, std::condition_variable& cv,
 		std::queue <threadData_t> & results);
 };

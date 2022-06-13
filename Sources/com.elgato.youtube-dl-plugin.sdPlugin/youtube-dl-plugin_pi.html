@@ -74,10 +74,10 @@
                        value="1">
             </div>
             <div class="sdpi-item">
-                <div class="sdpi-item-label">Youtube-dl Path</div>
+                <div class="sdpi-item-label">yt-dlp Path</div>
                 <input class="sdpi-item-value" id="youtubedl_path_textbox"
-                       placeholder="youtube-dl.exe path (default = internal exe)" oninput="updateSettingsToPlugin();"
-                       title="Use this to specify the location of youtube-dl.exe. ffmpeg.exe should be in the same folder. If empty, uses the default exe unpacked by the plugin."
+                       placeholder="yt-dlp.exe path (default = internal exe)" oninput="updateSettingsToPlugin();"
+                       title="Use this to specify the location of yt-dlp.exe. ffmpeg.exe should be in the same folder. If empty, uses the default exe unpacked by the plugin."
                        value="">
             </div>
             <div class="sdpi-item">
@@ -90,16 +90,16 @@
             <div class="sdpi-item">
                 <div class="sdpi-item-label">Command preview</div>
                 <textarea type="textarea" id="sample_command_textbox" readonly
-                          title="Sample command used to execute youtube-dl.exe"
+                          title="Sample command used to execute yt-dlp.exe"
                           rows="4"
                           value=""></textarea>
             </div>
             <div class="sdpi-item">
                 <div class="sdpi-item-label">Update</div>
                 <button class="sdpi-item-value" id="update_button"
-                        title="Runs youtube-dl.exe --update"
+                        title="Runs yt-dlp.exe --update"
                         onclick="sendCommand('update')">
-                    Update youtube-dl
+                    Update yt-dlp
                 </button>
             </div>
             <div class="sdpi-item">

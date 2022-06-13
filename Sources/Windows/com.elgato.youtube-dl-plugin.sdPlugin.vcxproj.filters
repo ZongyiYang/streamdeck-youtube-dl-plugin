@@ -98,14 +98,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Vendor\youtube-dl.exe">
-      <Filter>Resources</Filter>
-    </None>
     <None Include="..\Vendor\ffmpeg.exe">
       <Filter>Resources</Filter>
     </None>
     <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.html" />
     <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.js" />
+    <None Include="..\Vendor\yt-dlp.exe">
+      <Filter>Resources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="com.elgato.youtube-dl-plugin.sdPlugin.rc">

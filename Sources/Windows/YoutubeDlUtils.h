@@ -32,5 +32,5 @@ namespace youtubedlutils
 		const std::unordered_set<DL_TYPE>& optType,
 		const std::optional<std::string>& optCustomCommand);
 
-	std::string getYoutubeDlExePath(const std::optional<std::string>& optyoutubeDlExePath);
+	std::string getDownloaderExePath(const std::optional<std::string>& optyoutubeDlExePath);
 }
