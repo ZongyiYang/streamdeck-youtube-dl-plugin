@@ -1,5 +1,6 @@
 Sources/Windows/Debug
 Sources/Windows/Release
+Sources/Windows/*/Release
 Sources/Windows/.vs
 Sources/Windows/*.aps
 vim.exe.stackdump
