@@ -45,13 +45,12 @@ namespace curlutils
 	static std::size_t WriteMemoryCallback(void* contents, std::size_t size, std::size_t nmemb, void* userp)
 	{
 		std::size_t realsize = size * nmemb;
-		struct MemoryStruct* mem = (struct MemoryStruct*)userp;
+		struct MemoryStruct* mem = static_cast<struct MemoryStruct*>(userp);
 
 		uint8_t * newMem = static_cast<uint8_t*>(realloc(mem->memory, mem->size + realsize + 1));
 		if (newMem == NULL) {
 			/* out of memory! */
 			throw std::runtime_error("Error: not enough memory (realloc returned NULL)\n");
-			return 0;
 		}
 		
 		mem->memory = newMem;
@@ -117,7 +116,7 @@ namespace curlutils
 		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)& chunk);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void*>(&chunk));
 
 		CURLcode res = curl_easy_perform(curl);
 
@@ -128,7 +127,7 @@ namespace curlutils
 
 		// write data to file
 		std::ofstream ofs(path, std::ofstream::out | std::ofstream::binary);
-		ofs.write((char*)& chunk.memory[0], chunk.size);
+		ofs.write(reinterpret_cast<const char*>(chunk.memory), chunk.size);
 		ofs.close();
 	}
 }
