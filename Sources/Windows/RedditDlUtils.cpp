@@ -16,7 +16,7 @@
 #include "../Vendor/json/src/json.hpp"
 
 
-void redditdlutils::downloadRedditContent(const std::string& url, const std::string& outputFolder, curlutils::MemoryStruct& chunk)
+void redditdlutils::downloadRedditContent(const std::string& url, const std::string& outputFolder)
 {
 	// first get the json metadata from the reddit page using curl
 	std::unique_ptr<std::string> htmlData;
@@ -37,7 +37,7 @@ void redditdlutils::downloadRedditContent(const std::string& url, const std::str
 		std::string imgFileName = title.get<std::string>() + path.extension().string();
 
 		// download the file
-		curlutils::downloadFile(path.string(), outputFolder + "/" + imgFileName, chunk);
+		curlutils::downloadFile(path.string(), outputFolder + "/" + imgFileName);
 	}
 	else
 		throw std::invalid_argument("Error: reddit webpage does not contain image data.");

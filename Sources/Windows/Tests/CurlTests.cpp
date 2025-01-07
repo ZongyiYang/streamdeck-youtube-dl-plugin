@@ -46,20 +46,14 @@ namespace Tests
         const auto& [url, resultMsg] = GetParam();
 
         std::string errMsg;
-        struct curlutils::MemoryStruct chunk;
-        chunk.memory = (unsigned char*)malloc(1);  /* will be grown as needed by the realloc in the callback */
-        chunk.size = 0;    /* no data at this point */
         try
         {
-            redditdlutils::downloadRedditContent(url, "./", chunk);
+            redditdlutils::downloadRedditContent(url, "./");
         }
         catch (std::exception& e)
         {
             errMsg = std::string(e.what());
         }
-
-        if (chunk.memory)
-            free(chunk.memory);
 
         EXPECT_EQ(errMsg, resultMsg);
     }

@@ -37,6 +37,16 @@ namespace curlutils
 	struct MemoryStruct {
 		uint8_t* memory;
 		size_t size;
+
+		MemoryStruct() {
+			memory = reinterpret_cast<unsigned char*>(malloc(1)); /* will be grown as needed by the realloc in the callback */
+			size = 0;
+		}
+
+		~MemoryStruct() {
+			if (memory)
+				free(memory);
+		}
 	};
 
 	/**
@@ -103,10 +113,9 @@ namespace curlutils
 	 *
 	 * @param[in] url the url to download from
 	 * @param[in] path the output path
-	 * @param[in] chunk the MemoryStruct used by the callback. Must be allocated and deallocated outside this function
-	 * @throws runtime_error on failure to download file
+	 * @throws runtime_error on failure to download file or out of memory
 	**/
-	static void downloadFile(const std::string& url, const std::string& path, MemoryStruct& chunk)
+	static void downloadFile(const std::string& url, const std::string& path)
 	{
 		CURL* curl;
 
@@ -116,6 +125,7 @@ namespace curlutils
 		curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+		struct curlutils::MemoryStruct chunk;
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void*>(&chunk));
 
 		CURLcode res = curl_easy_perform(curl);

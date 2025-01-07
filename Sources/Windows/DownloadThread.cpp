@@ -120,22 +120,16 @@ void DownloadThread::launchDownloadProcess(const std::string& url, const context
 	{
 		bool success = false;
 		std::string errMsg;
-		struct curlutils::MemoryStruct chunk;
-		chunk.memory = (unsigned char*)malloc(1);  /* will be grown as needed by the realloc in the callback */
-		chunk.size = 0;    /* no data at this point */
 		try
 		{
 			mState = RUNNING;
-			redditdlutils::downloadRedditContent(url, youtubedlutils::getOutputFolderName(data.outputFolder), chunk);
+			redditdlutils::downloadRedditContent(url, youtubedlutils::getOutputFolderName(data.outputFolder));
 			success = true;
 		}
 		catch (std::exception& e)
 		{
 			errMsg = "Image download failed:\n" + std::string(e.what());
 		}
-
-		if (chunk.memory)
-			free(chunk.memory);
 
 		// if image dl was successful, no need to call youtube-dl, just exit as success
 		if (success == true)
