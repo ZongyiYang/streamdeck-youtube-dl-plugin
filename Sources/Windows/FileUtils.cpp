@@ -77,13 +77,40 @@ std::string fileutils::getDesktopPath()
 }
 
 /**
+ * Get the folder of a file
+ *
+ * @param[in] path the path of the file
+ * @return the path of the parent folder of the file, or just return the folder if input was already a folder
+ */
+std::filesystem::path fileutils::getFolder(const std::filesystem::path& path)
+{
+	if (!std::filesystem::is_directory(path))
+	{
+		return path.parent_path();
+	}
+	return path;
+}
+
+/**
  * Open a folder with explorer
  *
  * @param[in] path the path to the folder
  */
-void fileutils::openFolder(const std::string& path)
+void fileutils::openFolder(const std::filesystem::path& path)
 {
 	// explorer seems to only work with backwards slashes, so need to replace all forward slashes
-	std::string params = std::regex_replace(path, std::regex("\\/"), "\\");;
-	ShellExecute(NULL, NULL, L"explorer.exe", CA2T(params.c_str()), NULL, SW_SHOWNORMAL);
+	std::string path_str = std::regex_replace(getFolder(path).string(), std::regex("\\/"), "\\");;
+	ShellExecute(NULL, NULL, L"explorer.exe", CA2T(path_str.c_str()), NULL, SW_SHOWNORMAL);
+}
+
+/**
+ * Get the location of this exe
+ *
+ * @return the path to the exe
+ */
+std::filesystem::path fileutils::getCurrentExeFolder()
+{
+	wchar_t plugin_exe_path[MAX_PATH];
+	GetModuleFileNameW(NULL, plugin_exe_path, MAX_PATH);
+	return std::filesystem::path(plugin_exe_path);
 }

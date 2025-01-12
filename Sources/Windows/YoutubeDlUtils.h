@@ -14,6 +14,7 @@
 #include <string>
 #include <optional>
 #include <unordered_set>
+#include <filesystem>
 
 
 namespace youtubedlutils
@@ -32,5 +33,5 @@ namespace youtubedlutils
 		const std::unordered_set<DL_TYPE>& optType,
 		const std::optional<std::string>& optCustomCommand);
 
-	std::string getDownloaderExePath(const std::optional<std::string>& optyoutubeDlExePath);
+	std::filesystem::path getDownloaderExePath(const std::optional<std::string>& optyoutubeDlExePath);
 }

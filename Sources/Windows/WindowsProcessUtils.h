@@ -11,10 +11,11 @@
 #include <tchar.h>
 
 #include <string>
+#include <filesystem>
 
 namespace windowsprocessutils
 {
-	PROCESS_INFORMATION startProcess(const std::string& exePath, const std::string& cmd);
+	PROCESS_INFORMATION startProcess(const std::filesystem::path& exePath, const std::string& cmd);
 	void waitForProcess(PROCESS_INFORMATION pi);
 	void closeProcess(PROCESS_INFORMATION pi);
 

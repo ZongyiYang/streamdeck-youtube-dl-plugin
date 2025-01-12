@@ -45,7 +45,7 @@
             </div>
         </div>
         <div type="radio" class="sdpi-item" id="img_download_radio">
-            <div class="sdpi-item-label">Reddit Download</div>
+            <div class="sdpi-item-label">Reddit Image Download</div>
             <div class="sdpi-item-value">
                 <span class="sdpi-item-child">
                     <input id="rrdio_on" type="radio" value="on" name="rrdio" onChange="updateSettingsToPlugin();">
@@ -74,11 +74,25 @@
                        value="1">
             </div>
             <div class="sdpi-item">
-                <div class="sdpi-item-label">yt-dlp Path</div>
+                <div class="sdpi-item-label"
+                     onclick="sendCommand('openExeFolder');"
+                     style="cursor: pointer">yt-dlp Path</div>
                 <input class="sdpi-item-value" id="youtubedl_path_textbox"
                        placeholder="yt-dlp.exe path (default = internal exe)" oninput="updateSettingsToPlugin();"
                        title="Use this to specify the location of yt-dlp.exe. ffmpeg.exe should be in the same folder. If empty, uses the default exe unpacked by the plugin."
                        value="">
+            </div>
+            <div class="sdpi-item">
+                <!--TODO: the button should be indented properly, but can't seem to group it with textbox above
+                    on two separate lines. It just all displays on the same line, and there's not enough space
+                    for both the box and button.
+                    This hack kind of displays it correctly, but leaves a ':' displayed. -->
+                <div class="sdpi-item-label"></div>
+                <button class="sdpi-item-value" id="exe_path_button"
+                        title="Open the folder containing yt-dlp.exe"
+                        onclick="sendCommand('openExeFolder');">
+                    Open yt-dlp Folder
+                </button>
             </div>
             <div class="sdpi-item">
                 <div class="sdpi-item-label">Custom Command</div>

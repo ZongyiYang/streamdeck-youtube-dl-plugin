@@ -21,10 +21,10 @@
  *         filesystem_error if filesystem exists fails,
  *         invalid_argument if exe path does not exist
  */
-PROCESS_INFORMATION windowsprocessutils::startProcess(const std::string& exePath, const std::string& cmd)
+PROCESS_INFORMATION windowsprocessutils::startProcess(const std::filesystem::path& exePath, const std::string& cmd)
 {
 	if (!std::filesystem::exists(exePath))
-		throw std::invalid_argument("Cannot find exe at path: " + exePath);
+		throw std::invalid_argument("Cannot find exe at path: " + exePath.string());
 
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -34,7 +34,7 @@ PROCESS_INFORMATION windowsprocessutils::startProcess(const std::string& exePath
 	ZeroMemory(&pi, sizeof(pi));
 
 	// Start the child process. 
-	LPTSTR szAppName = CA2T(exePath.c_str());
+	LPTSTR szAppName = CA2T(exePath.string().c_str());
 
 	if (!CreateProcess(szAppName,
 		CA2T(cmd.c_str()),        // Command line
@@ -48,7 +48,7 @@ PROCESS_INFORMATION windowsprocessutils::startProcess(const std::string& exePath
 		&pi)           // Pointer to PROCESS_INFORMATION structure
 		)
 	{
-		throw std::runtime_error("Cannot run exe.\nExe path: " + exePath + "\nCommand:\n" + cmd + "\n" + getLastErrorAsString());
+		throw std::runtime_error("Cannot run exe.\nExe path: " + exePath.string() + "\nCommand:\n" + cmd + "\n" + getLastErrorAsString());
 	}
 
 	return pi;

@@ -236,7 +236,7 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string& inAction, const std
 	mVisibleContexts.at(inContext).buttonTimer->stop();
 
 	// get output folder name
-	std::string folder = youtubedlutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
+	const std::filesystem::path folder = youtubedlutils::getOutputFolderName(mVisibleContexts.at(inContext).data.outputFolder);
 
 	// start timer that opens this folder once time is reached
 	const uint32_t LONG_PRESS_TIME_MILLIS = 500;
@@ -470,7 +470,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 
 			json j;
 			const contextSettings_t& data = mVisibleContexts.at(inContext).data;
-			std::string exe = youtubedlutils::getDownloaderExePath(data.youtubeDlExePath);
+			const std::filesystem::path exe = youtubedlutils::getDownloaderExePath(data.youtubeDlExePath);
 
 			// first grab all the cmds based on selected options
 			std::vector<std::string> cmds;
@@ -493,7 +493,7 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 			std::string allCmds;
 			for (const auto& cmd : cmds)
 			{
-				allCmds += exe + cmd + "\n";
+				allCmds += exe.string() + cmd + "\n";
 			}
 			j["sampleCommand"] = allCmds;
 
@@ -538,6 +538,19 @@ void MyStreamDeckPlugin::runPICommands(const std::string& inContext, const json&
 					thd->kill();
 				}
 			}
+		}
+		else if (inPayload["command"] == "openExeFolder")
+		{
+			const contextSettings_t& data = mVisibleContexts.at(inContext).data;
+
+			if (data.youtubeDlExePath)
+				fileutils::openFolder(youtubedlutils::getDownloaderExePath(data.youtubeDlExePath));
+			else
+				fileutils::openFolder(fileutils::getCurrentExeFolder());
+		}
+		else
+		{
+			mConnectionManager->LogMessage("Recieved unknown command: " + std::string(inPayload["command"]) + " in context: " + inContext);
 		}
 	}
 }

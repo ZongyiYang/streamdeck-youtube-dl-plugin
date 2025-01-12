@@ -115,11 +115,11 @@ std::vector <std::string> youtubedlutils::getCommandQueue(const std::string& url
  *
  * @return path to downloader exe
  */
-std::string youtubedlutils::getDownloaderExePath(const std::optional<std::string>& optyoutubeDlExePath)
+std::filesystem::path youtubedlutils::getDownloaderExePath(const std::optional<std::string>& optyoutubeDlExePath)
 {
-	const std::string defaultDownloaderExePath = "yt-dlp.exe";
+	const std::filesystem::path defaultDownloaderExePath = "yt-dlp.exe";
 	if (optyoutubeDlExePath)
-		return *optyoutubeDlExePath;
+		return std::filesystem::path (*optyoutubeDlExePath);
 	else
 		return defaultDownloaderExePath;
 }

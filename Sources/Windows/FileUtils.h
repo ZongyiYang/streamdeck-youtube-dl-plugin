@@ -7,10 +7,13 @@
 //==============================================================================
 #pragma once
 #include <string>
+#include <filesystem>
 
 namespace fileutils
 {
 	std::string convertToValidNewFilePath(const std::string& folder, const std::string& filename, const std::string& extension);
 	std::string getDesktopPath();
-	void openFolder(const std::string& path);
+	std::filesystem::path getFolder(const std::filesystem::path& path);
+	void openFolder(const std::filesystem::path& path);
+	std::filesystem::path getCurrentExeFolder();
 }
