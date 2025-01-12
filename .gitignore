@@ -10,3 +10,4 @@ yt-dlp.exe
 Sources/youtube-dl-plugin-tests/Release
 Sources/youtube-dl-plugin-tests/Debug
 Sources/Windows/packages
+Sources/com.elgato.youtube-dl-plugin.sdPlugin/*.exe
