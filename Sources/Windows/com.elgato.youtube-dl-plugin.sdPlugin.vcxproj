@@ -251,6 +251,7 @@
     <ResourceCompile Include="com.elgato.youtube-dl-plugin.sdPlugin.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\README.md" />
     <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.html" />
     <None Include="..\com.elgato.youtube-dl-plugin.sdPlugin\youtube-dl-plugin_pi.js" />
     <None Include="..\Vendor\ffmpeg.exe" />

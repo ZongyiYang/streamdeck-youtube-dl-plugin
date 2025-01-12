@@ -106,6 +106,7 @@
     <None Include="..\Vendor\yt-dlp.exe">
       <Filter>Resources</Filter>
     </None>
+    <None Include="..\..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="com.elgato.youtube-dl-plugin.sdPlugin.rc">
